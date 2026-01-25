@@ -1,0 +1,211 @@
+# IMPORTANTE: Segurança
+
+# NUNCA commitar arquivos com senhas/secrets
+.env
+.env.local
+.env.production
+.env.*.local
+*.pem
+*.key
+*.crt
+
+# Java / Maven
+
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### Maven ###
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+
+# IDE
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+.idea_modules/
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+*.code-workspace
+.history/
+
+
+# Node / NPM / Frontend
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Frontend build
+/frontend/build
+/frontend/dist
+/frontend/.next
+/frontend/out
+
+# Testing
+/coverage
+/.nyc_output
+
+# Production
+/build
+/dist
+
+
+# Logs
+
+*.log
+logs/
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+
+# OS
+
+### macOS ###
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+### Windows ###
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+### Linux ###
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+
+# Docker
+
+# Não ignorar docker-compose.yml e Dockerfiles
+
+
+# Database
+
+*.sqlite
+*.sqlite3
+*.db
+
+
+# Temporary files
+
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+*.cache
+*.pid
+*.seed
+*.pid.lock
+
+
+# Upload / Media
+
+uploads/
+media/
+!uploads/.gitkeep
+!media/.gitkeep
+
+
+# Backup files
+
+*.backup
+*.sql.gz
+*.dump
+
+
+# Test coverage
+
+coverage/
+.nyc_output/
+*.coverage
+htmlcov/
+
+
+# Application specific
+
+# Configurações locais
+application-local.properties
+application-local.yml
+application-dev.properties
+application-dev.yml
+
+# H2 Database (se usar para testes)
+*.h2.db
+*.trace.db
+
+
+# Spring Boot
+
+spring-boot-devtools.properties
+
