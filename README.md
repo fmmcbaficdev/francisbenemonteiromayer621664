@@ -67,7 +67,7 @@ Sistema Full Stack para gerenciamento de artistas e álbuns musicais, desenvolvi
 
 ---
 
-## ✅ Requisitos Implementados
+## ✅ Requisitos exigidos a serem Implementados
 
 ### **Backend (27 pontos)**
 
@@ -115,7 +115,7 @@ Sistema Full Stack para gerenciamento de artistas e álbuns musicais, desenvolvi
 │   (React)     │  (Spring Boot)  │                       │
 │               │                 │                       │
 │  - React 18   │  - Java 21      │  - PostgreSQL 16      │
-│  - TypeScript │  - Spring 3.2   │  - MinIO (S3)         │
+│  - TypeScript │  - Spring 3.5   │  - MinIO (S3)         │
 │  - Tailwind   │  - JWT Security │                       │
 │  - Nginx      │  - WebSocket    │                       │
 │               │  - Swagger      │                       │
@@ -153,8 +153,8 @@ br.gov.mt.seplag
 
 ### **1. Clone o repositório**
 ```bash
-git clone https://github.com/fmmcbaficdev/ppfullstack621664.git
-cd ppfullstack621664
+git clone https://github.com/fmmcbaficdev/francisbenemonteiromayer621664
+cd francisbenemonteiromayer621664
 ```
 
 ### **2. Configure as variáveis de ambiente**
@@ -189,7 +189,7 @@ docker-compose logs -f backend
 
 ---
 
-## 📡 Endpoints da API
+## 📡 Endpoints da API - Swagger
 
 ### **Autenticação**
 ```http
