@@ -2,8 +2,12 @@ package br.gov.mt.seplag.backend.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,6 +16,7 @@ import java.util.Set;
 @Table(name = "albuns", indexes = {
         @Index(name = "idx_album_titulo", columnList = "titulo")
 })
+@EntityListeners(AuditingEntityListener.class)
 @Data
 @Builder
 @NoArgsConstructor
@@ -45,12 +50,34 @@ public class Album {
     @Builder.Default
     private Set<ImagemCapa> imagensCapa = new HashSet<>();
 
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    // ═══════════════════════════════════════════════════════════
+    // AUDITORIA - Spring Data JPA Auditing
+    // ═══════════════════════════════════════════════════════════
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(nullable = false)
+    @CreatedBy
+    @Column(name = "created_by", length = 100, updatable = false)
+    private String createdBy;
+
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @LastModifiedBy
+    @Column(name = "updated_by", length = 100)
+    private String updatedBy;
+
+    // ═══════════════════════════════════════════════════════════
+    // OPTIMISTIC LOCKING - Controle de Concorrência
+    // ═══════════════════════════════════════════════════════════
+
+    @Version
+    @Column(name = "version")
+    private Integer version;
 }
+
+
 

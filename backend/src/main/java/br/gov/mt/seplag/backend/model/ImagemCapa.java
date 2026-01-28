@@ -2,11 +2,15 @@ package br.gov.mt.seplag.backend.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "imagens_capa")
+@EntityListeners(AuditingEntityListener.class)
 @Data
 @Builder
 @NoArgsConstructor
@@ -34,7 +38,16 @@ public class ImagemCapa {
     @Column(nullable = false)
     private Long tamanho;
 
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    // ═══════════════════════════════════════════════════════════
+    // AUDITORIA
+    // ═══════════════════════════════════════════════════════════
+
+    @CreatedDate
+    @Column(name = "uploaded_at", nullable = false, updatable = false)
     private LocalDateTime uploadedAt;
+
+    @CreatedBy
+    @Column(name = "uploaded_by", length = 100, updatable = false)
+    private String uploadedBy;
 }
+
