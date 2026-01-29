@@ -1,5 +1,10 @@
-# IMPORTANTE: Segurança
+# ============================================
+# .gitignore - SEPLAG/MT Full Stack
+# ============================================
 
+# --------------------------------------------
+# IMPORTANTE: Segurança
+# --------------------------------------------
 # NUNCA commitar arquivos com senhas/secrets
 .env
 .env.local
@@ -9,8 +14,9 @@
 *.key
 *.crt
 
+# --------------------------------------------
 # Java / Maven
-
+# --------------------------------------------
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -27,17 +33,18 @@ buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
 
+# --------------------------------------------
 # Gradle
-
+# --------------------------------------------
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-
+# --------------------------------------------
 # IDE
-
+# --------------------------------------------
 ### IntelliJ IDEA ###
 .idea/
 *.iws
@@ -70,9 +77,9 @@ bin/
 *.code-workspace
 .history/
 
-
+# --------------------------------------------
 # Node / NPM / Frontend
-
+# --------------------------------------------
 node_modules/
 npm-debug.log*
 yarn-debug.log*
@@ -94,9 +101,9 @@ lerna-debug.log*
 /build
 /dist
 
-
+# --------------------------------------------
 # Logs
-
+# --------------------------------------------
 *.log
 logs/
 *.log.*
@@ -104,9 +111,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-
+# --------------------------------------------
 # OS
-
+# --------------------------------------------
 ### macOS ###
 .DS_Store
 .AppleDouble
@@ -143,21 +150,21 @@ $RECYCLE.BIN/
 .Trash-*
 .nfs*
 
-
+# --------------------------------------------
 # Docker
-
+# --------------------------------------------
 # Não ignorar docker-compose.yml e Dockerfiles
 
-
+# --------------------------------------------
 # Database
-
+# --------------------------------------------
 *.sqlite
 *.sqlite3
 *.db
 
-
+# --------------------------------------------
 # Temporary files
-
+# --------------------------------------------
 *.tmp
 *.temp
 *.swp
@@ -168,32 +175,32 @@ $RECYCLE.BIN/
 *.seed
 *.pid.lock
 
-
+# --------------------------------------------
 # Upload / Media
-
+# --------------------------------------------
 uploads/
 media/
 !uploads/.gitkeep
 !media/.gitkeep
 
-
+# --------------------------------------------
 # Backup files
-
+# --------------------------------------------
 *.backup
 *.sql.gz
 *.dump
 
-
+# --------------------------------------------
 # Test coverage
-
+# --------------------------------------------
 coverage/
 .nyc_output/
 *.coverage
 htmlcov/
 
-
+# --------------------------------------------
 # Application specific
-
+# --------------------------------------------
 # Configurações locais
 application-local.properties
 application-local.yml
@@ -204,8 +211,84 @@ application-dev.yml
 *.h2.db
 *.trace.db
 
-
+# --------------------------------------------
 # Spring Boot
-
+# --------------------------------------------
 spring-boot-devtools.properties
 
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+.nyc_output
+
+# Production
+build/
+dist/
+out/
+
+# Environment
+.env
+.env.local
+.env.production
+.env.development
+
+# Java/Maven/Gradle
+backend/target/
+backend/.mvn/
+backend/*.jar
+backend/*.war
+backend/.gradle/
+backend/build/
+
+# Docker
+docker-compose.override.yml
+
+# Temp
+*.tmp
+*.temp
+.cache/
+
+# ============================================
+# ARQUIVOS A SEREM COMITADOS
+# ============================================
+#
+# ✅ Commitar:
+# - .env.example (template)
+# - .gitignore (este arquivo)
+# - docker-compose.yml
+# - Dockerfile
+# - pom.xml
+# - package.json
+# - src/
+# - README.md
+# - Documentação
+#
+# ❌ NÃO Commitar:
+# - .env (contém senhas)
+# - target/ (build artifacts)
+# - node_modules/ (dependências)
+# - *.log (logs)
+# - IDE configs (.idea/, .vscode/)
+#
+# ============================================
