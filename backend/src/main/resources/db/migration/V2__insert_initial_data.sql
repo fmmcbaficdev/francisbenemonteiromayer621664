@@ -3,7 +3,7 @@
 -- ============================================
 -- Senha: admin123 (BCrypt)
 INSERT INTO usuarios (username, password, nome) VALUES
-('admin', '$2a$10$rZJ1JKuZ8.Nxw.GQx8h8OuGY7k5oLZ9hO.6fK9qC7kGYqXD8YZJKa', 'Administrador');
+('admin', '$2a$10$5tkeVtFOUQDy7RExTudI6uwsQee3zQpB.VQfPSBrQw1Bd0/rr8K0C', 'Administrador');
 
 -- ============================================
 -- INSERIR ARTISTAS (CONFORME EDITAL)

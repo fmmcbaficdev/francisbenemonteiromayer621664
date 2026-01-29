@@ -12,6 +12,17 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * ENTIDADE: Artista
+ *
+ * Representa um artista musical cadastrado no sistema.
+ * Possui relacionamento N:N com Album (permite colaborações).
+ *
+ * RECURSOS SÊNIOR IMPLEMENTADOS:
+ * - Optimistic Locking (@Version) para controle de concorrência
+ * - Auditoria completa (created_by, updated_by)
+ * - EntityListener para auditoria automática via Spring Data
+ */
 @Entity
 @Table(name = "artistas", indexes = {
         @Index(name = "idx_artista_nome", columnList = "nome")
@@ -38,7 +49,7 @@ public class Artista {
     @Builder.Default
     private Set<Album> albuns = new HashSet<>();
 
-   // ═══════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════
     // AUDITORIA - Spring Data JPA Auditing
     // ═══════════════════════════════════════════════════════════
 

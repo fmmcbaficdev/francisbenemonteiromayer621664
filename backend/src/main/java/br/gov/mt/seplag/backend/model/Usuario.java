@@ -2,14 +2,31 @@ package br.gov.mt.seplag.backend.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * ENTIDADE: Usuario
+ *
+ * Representa um usuário do sistema com autenticação JWT.
+ * Implementa UserDetails do Spring Security.
+ *
+ * RECURSOS:
+ * - Optimistic Locking (@Version)
+ * - Soft delete (campo ativo)
+ * - Auditoria (created_at, updated_at)
+ */
 @Entity
-@Table(name = "usuarios")
+@Table(name = "usuarios", indexes = {
+        @Index(name = "idx_usuario_username", columnList = "username")
+})
 @Data
 @Builder
 @NoArgsConstructor
@@ -20,14 +37,48 @@ public class Usuario implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 50)
     private String username;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String password;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 200)
     private String nome;
+
+    @Column(length = 200, unique = true)
+    private String email;
+
+    /**
+     * Flag para soft delete / desativação de usuário
+     */
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean ativo = true;
+
+    // ═══════════════════════════════════════════════════════════
+    // AUDITORIA
+    // ═══════════════════════════════════════════════════════════
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
+    // ═══════════════════════════════════════════════════════════
+    // OPTIMISTIC LOCKING
+    // ═══════════════════════════════════════════════════════════
+
+    @Version
+    @Column(name = "version")
+    private Integer version;
+
+    // ═══════════════════════════════════════════════════════════
+    // SPRING SECURITY - UserDetails
+    // ═══════════════════════════════════════════════════════════
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -51,7 +102,6 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return ativo != null && ativo;
     }
 }
-

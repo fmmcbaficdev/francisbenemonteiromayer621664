@@ -1,28 +1,38 @@
 package br.gov.mt.seplag.backend.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 /**
  * DTO para transferência de dados de Regional
+ *
+ * SINCRONIZAÇÃO COM API EXTERNA:
+ * - codigoExterno: ID da regional na API externa
+ * - externalHash: MD5 do nome para detectar mudanças (algoritmo O(n))
+ * - ativa: false quando regional foi removida da API externa
  */
-public record RegionalDTO(
-        Long id,
-        Integer codigoExterno,
-        String nome,
-        Boolean ativa,
-        LocalDateTime ultimaSincronizacao
-) {
-    /**
-     * Factory para regionais ativas
-     */
-    public static RegionalDTO ativa(Integer codigoExterno, String nome) {
-        return new RegionalDTO(null, codigoExterno, nome, true, LocalDateTime.now());
-    }
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class RegionalDTO {
+
+    private Long id;
+    private Integer codigoExterno;
+    private String nome;
+    private Boolean ativa;
 
     /**
-     * Verifica se a regional está ativa
+     * Hash MD5 do nome para detectar alterações.
+     * Usado no algoritmo de sincronização O(n).
      */
-    public boolean isAtiva() {
-        return Boolean.TRUE.equals(ativa);
-    }
+    private String externalHash;
+
+    private LocalDateTime ultimaSincronizacao;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

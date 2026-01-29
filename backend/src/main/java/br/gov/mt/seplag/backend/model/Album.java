@@ -12,9 +12,22 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * ENTIDADE: Album
+ *
+ * Representa um álbum musical no sistema.
+ * Possui relacionamento N:N com Artista (permite colaborações).
+ * Possui relacionamento 1:N com ImagemCapa.
+ *
+ * RECURSOS SÊNIOR IMPLEMENTADOS:
+ * - Optimistic Locking (@Version) para controle de concorrência
+ * - Auditoria completa (created_by, updated_by)
+ * - EntityListener para auditoria automática via Spring Data
+ */
 @Entity
 @Table(name = "albuns", indexes = {
-        @Index(name = "idx_album_titulo", columnList = "titulo")
+        @Index(name = "idx_album_titulo", columnList = "titulo"),
+        @Index(name = "idx_album_ano", columnList = "ano_lancamento")
 })
 @EntityListeners(AuditingEntityListener.class)
 @Data
@@ -78,6 +91,3 @@ public class Album {
     @Column(name = "version")
     private Integer version;
 }
-
-
-

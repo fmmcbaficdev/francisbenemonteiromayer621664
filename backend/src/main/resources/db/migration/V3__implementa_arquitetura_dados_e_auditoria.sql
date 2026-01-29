@@ -1,7 +1,9 @@
 -- ============================================================================
 -- MIGRATION V3: MELHORIAS DE NÍVEL SÊNIOR
 -- ============================================================================
-
+-- Autor: Candidato SEPLAG/MT 2025
+-- Data: 2025-01-27
+--
 -- OBJETIVO: Adicionar recursos avançados para demonstrar expertise sênior:
 -- 1. Optimistic Locking (campo version)
 -- 2. Auditoria completa (created_by, updated_by)
