@@ -1,70 +1,87 @@
 package br.gov.mt.seplag.backend.controller;
 
 import br.gov.mt.seplag.backend.dto.RegionalDTO;
-import br.gov.mt.seplag.backend.dto.SyncResultDTO;
-import br.gov.mt.seplag.backend.service.RegionalService;
 import br.gov.mt.seplag.backend.service.RegionalSyncService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
+/**
+ * Controller REST para Regionais
+ */
 @RestController
-@RequestMapping("/api/v1/regionais")
+@RequestMapping("/v1/regionais")
 @RequiredArgsConstructor
-@Tag(name = "Regionais", description = "Gerenciamento de regionais e sincronização")
+@Slf4j
+@Tag(name = "Regionais", description = "Gerenciamento de Regionais da Polícia Civil")
+@SecurityRequirement(name = "Bearer Authentication")
 public class RegionalController {
 
-    private final RegionalService regionalService;
+    private final br.gov.mt.seplag.backend.service.RegionalService regionalService;
     private final RegionalSyncService regionalSyncService;
 
+    /**
+     * GET /v1/regionais
+     * Listar todas as regionais com paginação
+     */
     @GetMapping
-    @Operation(summary = "Listar regionais", description = "Lista todas as regionais com paginação e filtro")
+    @Operation(summary = "Listar regionais", description = "Lista todas as regionais com paginação")
     public ResponseEntity<Page<RegionalDTO>> listar(
-            @Parameter(description = "Filtrar por status ativo")
-            @RequestParam(required = false) Boolean ativa,
-            @PageableDefault(size = 10, sort = "nome") Pageable pageable
+            @PageableDefault(size = 10, sort = "nome", direction = Sort.Direction.ASC) Pageable pageable,
+            @RequestParam(required = false) Boolean ativa
     ) {
-        return ResponseEntity.ok(regionalService.listar(pageable, ativa));
+        log.debug("GET /v1/regionais - página: {}, ativa: {}", pageable.getPageNumber(), ativa);
+        Page<RegionalDTO> regionais = regionalService.listar(pageable, ativa);
+        return ResponseEntity.ok(regionais);
     }
 
+    /**
+     * GET /v1/regionais/{id}
+     * Buscar regional por ID
+     */
     @GetMapping("/{id}")
-    @Operation(summary = "Buscar regional por ID")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Regional encontrada"),
-            @ApiResponse(responseCode = "404", description = "Regional não encontrada")
-    })
+    @Operation(summary = "Buscar por ID", description = "Busca regional por ID")
     public ResponseEntity<RegionalDTO> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(regionalService.buscarPorId(id));
+        log.debug("GET /v1/regionais/{}", id);
+        RegionalDTO regional = regionalService.buscarPorId(id);
+        return ResponseEntity.ok(regional);
     }
 
-    @GetMapping("/codigo/{codigoExterno}")
-    @Operation(summary = "Buscar regional por código externo")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Regional encontrada"),
-            @ApiResponse(responseCode = "404", description = "Regional não encontrada")
-    })
+    /**
+     * GET /v1/regionais/codigo-externo/{codigoExterno}
+     * Buscar regional por código externo
+     */
+    @GetMapping("/codigo-externo/{codigoExterno}")
+    @Operation(summary = "Buscar por código externo", description = "Busca regional por código externo da API")
     public ResponseEntity<RegionalDTO> buscarPorCodigoExterno(@PathVariable Integer codigoExterno) {
-        return ResponseEntity.ok(regionalService.buscarPorCodigoExterno(codigoExterno));
+        log.debug("GET /v1/regionais/codigo-externo/{}", codigoExterno);
+        RegionalDTO regional = regionalService.buscarPorCodigoExterno(codigoExterno);
+        return ResponseEntity.ok(regional);
     }
 
-    @PostMapping("/sync")
+    /**
+     * POST /v1/regionais/sincronizar
+     * Sincronizar regionais com API externa manualmente
+     */
+    @PostMapping("/sincronizar")
     @Operation(
             summary = "Sincronizar regionais",
-            description = "Sincroniza regionais com a API externa usando algoritmo O(n)"
+            description = "Sincroniza regionais com a API externa da Polícia Civil. " +
+                    "Algoritmo O(n) com complexidade linear."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Sincronização concluída")
-    })
-    public ResponseEntity<SyncResultDTO> sincronizar() {
-        SyncResultDTO resultado = regionalSyncService.sincronizar();
+    public ResponseEntity<Map<String, Object>> sincronizar() {
+        log.info("POST /v1/regionais/sincronizar - Iniciando sincronização manual");
+        Map<String, Object> resultado = regionalSyncService.sincronizar();
         return ResponseEntity.ok(resultado);
     }
 }
