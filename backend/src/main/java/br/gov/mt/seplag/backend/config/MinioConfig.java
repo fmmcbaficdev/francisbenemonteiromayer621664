@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @Slf4j
-public class MinioConfig {
+public class MinIOConfig {
 
     @Value("${minio.url}")
     private String minioUrl;
@@ -32,4 +32,3 @@ public class MinioConfig {
                 .build();
     }
 }
-
