@@ -1,9 +1,12 @@
 package br.gov.mt.seplag.backend.exception;
 
-import br.gov.mt.seplag.backend.dto.ErrorResponse;
+import br.gov.mt.seplag.backend.dto.ErrorResponseDTO;
+import jakarta.persistence.OptimisticLockException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -11,6 +14,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,25 +30,25 @@ public class GlobalExceptionHandler {
      * Tratar erros de validação (@Valid)
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationErrors(
+    public ResponseEntity<ErrorResponseDTO> handleValidationErrors(
             MethodArgumentNotValidException ex,
             WebRequest request
     ) {
-        List<String> errors = ex.getBindingResult().getAllErrors().stream()
-                .map(error -> {
-                    String fieldName = ((FieldError) error).getField();
-                    String errorMessage = error.getDefaultMessage();
-                    return fieldName + ": " + errorMessage;
-                })
-                .toList();
+        List<String> errors = new ArrayList<>();
+        ex.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.add(fieldName + ": " + errorMessage);
+        });
 
-        var errorResponse = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                "Validation Error",
-                "Erro de validação nos campos",
-                getPath(request),
-                errors
-        );
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Validation Error")
+                .message("Erro de validação nos campos")
+                .path(request.getDescription(false).replace("uri=", ""))
+                .errors(errors)
+                .build();
 
         return ResponseEntity.badRequest().body(errorResponse);
     }
@@ -52,18 +57,19 @@ public class GlobalExceptionHandler {
      * Tratar credenciais inválidas
      */
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorResponse> handleBadCredentials(
+    public ResponseEntity<ErrorResponseDTO> handleBadCredentials(
             BadCredentialsException ex,
             WebRequest request
     ) {
         log.warn("Tentativa de login com credenciais inválidas");
 
-        var errorResponse = new ErrorResponse(
-                HttpStatus.UNAUTHORIZED.value(),
-                "Unauthorized",
-                "Usuário ou senha inválidos",
-                getPath(request)
-        );
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .error("Unauthorized")
+                .message("Usuário ou senha inválidos")
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
@@ -72,58 +78,100 @@ public class GlobalExceptionHandler {
      * Tratar entidade não encontrada (404)
      */
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleEntityNotFound(
+    public ResponseEntity<ErrorResponseDTO> handleEntityNotFound(
             EntityNotFoundException ex,
             WebRequest request
     ) {
         log.warn("Entidade não encontrada: {}", ex.getMessage());
 
-        var errorResponse = new ErrorResponse(
-                HttpStatus.NOT_FOUND.value(),
-                "Not Found",
-                ex.getMessage(),
-                getPath(request)
-        );
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error("Not Found")
+                .message(ex.getMessage())
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     /**
-     * Tratar erros de validação de negócio
+     * Tratar conflito de concorrência (Optimistic Locking) - 409 Conflict
+     *
+     * CENÁRIO:
+     * 1. Usuário A: GET /artistas/1 → { nome: "Serj", version: 5 }
+     * 2. Usuário B: GET /artistas/1 → { nome: "Serj", version: 5 }
+     * 3. Usuário A: PUT { nome: "Serj Tankian", version: 5 } → Sucesso → version: 6
+     * 4. Usuário B: PUT { nome: "Serj T.", version: 5 } → 409 Conflict (version já é 6!)
+     *
+     * SOLUÇÃO: Frontend deve recarregar dados e tentar novamente
      */
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ErrorResponse> handleValidation(
-            ValidationException ex,
+    @ExceptionHandler({OptimisticLockException.class, ObjectOptimisticLockingFailureException.class})
+    public ResponseEntity<ErrorResponseDTO> handleOptimisticLock(
+            Exception ex,
             WebRequest request
     ) {
-        log.warn("Erro de validação: {}", ex.getMessage());
+        log.warn("Conflito de concorrência (Optimistic Lock): {}", ex.getMessage());
 
-        var errorResponse = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
-                ex.getMessage(),
-                getPath(request)
-        );
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error("Conflict")
+                .message("Este registro foi modificado por outro usuário. Recarregue os dados e tente novamente.")
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
 
-        return ResponseEntity.badRequest().body(errorResponse);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    /**
+     * Tratar violação de integridade de dados (constraint unique, FK, etc) - 409 Conflict
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponseDTO> handleDataIntegrityViolation(
+            DataIntegrityViolationException ex,
+            WebRequest request
+    ) {
+        log.warn("Violação de integridade de dados: {}", ex.getMessage());
+
+        String mensagem = "Erro de integridade de dados";
+
+        // Tentar identificar o tipo de violação
+        String rootCause = ex.getRootCause() != null ? ex.getRootCause().getMessage() : "";
+        if (rootCause.contains("unique") || rootCause.contains("duplicate")) {
+            mensagem = "Registro duplicado. Já existe um registro com esses dados.";
+        } else if (rootCause.contains("foreign key") || rootCause.contains("violates foreign key")) {
+            mensagem = "Não é possível realizar esta operação pois existem registros relacionados.";
+        }
+
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error("Conflict")
+                .message(mensagem)
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     /**
      * Tratar RuntimeException (genérico)
      */
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorResponse> handleRuntimeException(
+    public ResponseEntity<ErrorResponseDTO> handleRuntimeException(
             RuntimeException ex,
             WebRequest request
     ) {
         log.error("RuntimeException: {}", ex.getMessage());
 
-        var errorResponse = new ErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal Server Error",
-                ex.getMessage(),
-                getPath(request)
-        );
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .error("Internal Server Error")
+                .message(ex.getMessage())
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
@@ -132,26 +180,20 @@ public class GlobalExceptionHandler {
      * Tratar qualquer outra exceção
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGlobalException(
+    public ResponseEntity<ErrorResponseDTO> handleGlobalException(
             Exception ex,
             WebRequest request
     ) {
         log.error("Exception: {}", ex.getMessage(), ex);
 
-        var errorResponse = new ErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal Server Error",
-                "Erro interno do servidor",
-                getPath(request)
-        );
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .error("Internal Server Error")
+                .message("Erro interno do servidor")
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-    }
-
-    /**
-     * Extrair path da requisição
-     */
-    private String getPath(WebRequest request) {
-        return request.getDescription(false).replace("uri=", "");
     }
 }
