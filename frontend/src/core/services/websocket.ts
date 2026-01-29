@@ -27,7 +27,7 @@ class WebSocketService {
   // ==========================================
   // CONNECT
   // ==========================================
-
+  
   connect(): void {
     if (this.client?.connected) {
       console.log('WebSocket já conectado');
@@ -38,34 +38,34 @@ class WebSocketService {
 
     this.client = new Client({
       webSocketFactory: () => new SockJS(wsUrl),
-
+      
       debug: (str) => {
         if (import.meta.env.DEV) {
           console.log('STOMP Debug:', str);
         }
       },
-
+      
       reconnectDelay: this.reconnectDelay,
-
+      
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
-
+      
       onConnect: () => {
         console.log('✅ WebSocket conectado!');
         this.reconnectAttempts = 0;
         this.subscribeToNotifications();
       },
-
+      
       onStompError: (frame) => {
         console.error('❌ Erro STOMP:', frame.headers['message']);
         console.error('Detalhes:', frame.body);
       },
-
+      
       onWebSocketClose: () => {
         console.log('⚠️ WebSocket desconectado');
         this.handleReconnect();
       },
-
+      
       onWebSocketError: (error) => {
         console.error('❌ Erro WebSocket:', error);
       },
@@ -77,7 +77,7 @@ class WebSocketService {
   // ==========================================
   // SUBSCRIBE TO NOTIFICATIONS
   // ==========================================
-
+  
   private subscribeToNotifications(): void {
     if (!this.client?.connected) return;
 
@@ -98,12 +98,12 @@ class WebSocketService {
   // ==========================================
   // HANDLE RECONNECT
   // ==========================================
-
+  
   private handleReconnect(): void {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
       console.log(`🔄 Tentando reconectar... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
-
+      
       setTimeout(() => {
         this.connect();
       }, this.reconnectDelay * this.reconnectAttempts);
@@ -115,7 +115,7 @@ class WebSocketService {
   // ==========================================
   // DISCONNECT
   // ==========================================
-
+  
   disconnect(): void {
     if (this.client) {
       this.client.deactivate();
@@ -127,10 +127,10 @@ class WebSocketService {
   // ==========================================
   // CALLBACK MANAGEMENT
   // ==========================================
-
+  
   subscribe(callback: NotificationCallback): () => void {
     this.callbacks.push(callback);
-
+    
     // Retorna função de unsubscribe
     return () => {
       const index = this.callbacks.indexOf(callback);
@@ -153,7 +153,7 @@ class WebSocketService {
   // ==========================================
   // STATUS
   // ==========================================
-
+  
   isConnected(): boolean {
     return this.client?.connected ?? false;
   }

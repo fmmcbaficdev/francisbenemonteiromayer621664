@@ -1,68 +1,232 @@
+@import "tailwindcss";
+
+/* ==========================================
+   TEMA PERSONALIZADO TAILWIND V4
+   ========================================== */
+
+@theme {
+  /* Cores Primárias - Azul escuro */
+  --color-primary-50: #f0f4f8;
+  --color-primary-100: #d9e2ec;
+  --color-primary-200: #bcccdc;
+  --color-primary-300: #9fb3c8;
+  --color-primary-400: #829ab1;
+  --color-primary-500: #627d98;
+  --color-primary-600: #1e3a5f;
+  --color-primary-700: #19324d;
+  --color-primary-800: #142a3f;
+  --color-primary-900: #0f2132;
+
+  /* Cores Douradas */
+  --color-gold-50: #fdf9e7;
+  --color-gold-100: #faf0c4;
+  --color-gold-200: #f5e08a;
+  --color-gold-300: #e9c85a;
+  --color-gold-400: #d4af37;
+  --color-gold-500: #b8952f;
+  --color-gold-600: #967827;
+  --color-gold-700: #745c1f;
+  --color-gold-800: #5a4718;
+  --color-gold-900: #463712;
+
+  /* Cores de Destaque - Vermelho */
+  --color-accent-50: #fde8eb;
+  --color-accent-100: #f9c5cc;
+  --color-accent-200: #f49aa6;
+  --color-accent-300: #e86a7a;
+  --color-accent-400: #d94452;
+  --color-accent-500: #c41e3a;
+  --color-accent-600: #a31830;
+  --color-accent-700: #821326;
+  --color-accent-800: #620e1c;
+  --color-accent-900: #420912;
+}
+
+/* ==========================================
+   TEMA POLÍCIA CIVIL MT
+   ========================================== */
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+  --color-primary: #1e3a5f;
+  --color-gold: #d4af37;
+  --color-accent: #c41e3a;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  @apply bg-gray-100 text-gray-900;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* ==========================================
+   SCROLLBAR PERSONALIZADA
+   ========================================== */
+
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+::-webkit-scrollbar-track {
+  @apply bg-gray-200;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+::-webkit-scrollbar-thumb {
+  @apply bg-primary-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-primary-700;
+}
+
+/* ==========================================
+   BOTÕES
+   ========================================== */
+
+.btn {
+  @apply px-4 py-2 rounded-lg font-semibold transition-all duration-200
+         focus:outline-none focus:ring-2 focus:ring-offset-2
+         transform active:scale-95;
+}
+
+.btn-primary {
+  @apply px-4 py-2 rounded-lg font-semibold transition-all duration-200
+         focus:outline-none focus:ring-2 focus:ring-offset-2
+         transform active:scale-95
+         bg-primary-600 text-white hover:bg-primary-700
+         focus:ring-primary-500 shadow-lg hover:shadow-xl;
+}
+
+.btn-gold {
+  @apply px-4 py-2 rounded-lg font-semibold transition-all duration-200
+         focus:outline-none focus:ring-2 focus:ring-offset-2
+         transform active:scale-95
+         bg-gold-400 text-primary-900 hover:bg-gold-500
+         focus:ring-gold-400 shadow-lg hover:shadow-xl font-bold;
+}
+
+.btn-secondary {
+  @apply px-4 py-2 rounded-lg font-semibold transition-all duration-200
+         focus:outline-none focus:ring-2 focus:ring-offset-2
+         transform active:scale-95
+         bg-white text-primary-600 border-2 border-primary-600
+         hover:bg-primary-50 focus:ring-primary-400;
+}
+
+.btn-danger {
+  @apply px-4 py-2 rounded-lg font-semibold transition-all duration-200
+         focus:outline-none focus:ring-2 focus:ring-offset-2
+         transform active:scale-95
+         bg-accent-500 text-white hover:bg-accent-600
+         focus:ring-accent-400 shadow-lg;
+}
+
+.btn-ghost {
+  @apply px-4 py-2 rounded-lg font-semibold transition-all duration-200
+         focus:outline-none focus:ring-2 focus:ring-offset-2
+         transform active:scale-95
+         bg-transparent text-primary-600 hover:bg-primary-50;
+}
+
+/* ==========================================
+   INPUTS
+   ========================================== */
+
+.input {
+  @apply w-full px-4 py-3 border-2 border-gray-300 rounded-lg
+         focus:outline-none focus:ring-2 focus:ring-primary-500
+         focus:border-primary-500 transition-all duration-200
+         bg-white;
+}
+
+.input:focus {
+  @apply border-primary-600 ring-primary-200;
+}
+
+.label {
+  @apply block text-sm font-semibold text-primary-700 mb-1;
+}
+
+/* ==========================================
+   CARDS
+   ========================================== */
+
+.card {
+  @apply bg-white rounded-xl shadow-md border border-gray-200
+         overflow-hidden transition-all duration-300;
+}
+
+.card-hover {
+  @apply bg-white rounded-xl shadow-md border border-gray-200
+         overflow-hidden transition-all duration-300
+         hover:shadow-xl hover:-translate-y-1 cursor-pointer;
+}
+
+/* ==========================================
+   HEADER/NAVBAR
+   ========================================== */
+
+.navbar {
+  @apply bg-primary-600 text-white shadow-xl;
+}
+
+.navbar-brand {
+  @apply text-gold-400 font-bold text-xl;
+}
+
+/* ==========================================
+   BADGES
+   ========================================== */
+
+.badge {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+}
+
+.badge-gold {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+         bg-gold-100 text-gold-700 border border-gold-300;
+}
+
+.badge-success {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+         bg-green-100 text-green-700;
+}
+
+.badge-danger {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+         bg-accent-100 text-accent-700;
+}
+
+/* ==========================================
+   LOADING
+   ========================================== */
+
+.spinner {
+  @apply animate-spin rounded-full border-4 border-gray-200 border-t-gold-400;
+}
+
+/* ==========================================
+   TABLE
+   ========================================== */
+
+.table-header {
+  @apply bg-primary-600 text-white;
+}
+
+.table-row {
+  @apply hover:bg-primary-50 transition-colors;
+}
+
+/* ==========================================
+   GRADIENTES
+   ========================================== */
+
+.gradient-primary {
+  background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6f 100%);
+}
+
+.gradient-gold {
+  background: linear-gradient(135deg, #d4af37 0%, #f0d060 100%);
+}
+
+.gradient-header {
+  background: linear-gradient(135deg, #1e3a5f 0%, #0f2132 100%);
 }
