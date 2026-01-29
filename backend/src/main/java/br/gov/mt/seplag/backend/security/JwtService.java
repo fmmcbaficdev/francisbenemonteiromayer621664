@@ -131,4 +131,3 @@ public class JwtService {
         return jwtExpiration / 1000; // segundos
     }
 }
-
