@@ -1,7 +1,5 @@
 package br.gov.mt.seplag.backend.service;
 
-
-
 import br.gov.mt.seplag.backend.dto.ArtistaDTO;
 import br.gov.mt.seplag.backend.exception.EntityNotFoundException;
 import br.gov.mt.seplag.backend.model.Artista;
@@ -15,6 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service para lógica de negócio de Artistas
+ *
+ * RECURSOS IMPLEMENTADOS:
+ * - CRUD completo com paginação e busca
+ * - Auditoria automática (created_by, updated_by via Spring Data Auditing)
+ * - Optimistic Locking (version para controle de concorrência)
  */
 @Service
 @RequiredArgsConstructor
@@ -30,7 +33,7 @@ public class ArtistaService {
     public Page<ArtistaDTO> listar(Pageable pageable) {
         log.debug("Listando artistas - página: {}", pageable.getPageNumber());
         return artistaRepository.findAll(pageable)
-                .map(this::toDTO);
+                .map(this::convertToDTO);
     }
 
     /**
@@ -40,7 +43,7 @@ public class ArtistaService {
     public Page<ArtistaDTO> buscarPorNome(String nome, Pageable pageable) {
         log.debug("Buscando artistas por nome: {}", nome);
         return artistaRepository.findByNomeContainingIgnoreCase(nome, pageable)
-                .map(this::toDTO);
+                .map(this::convertToDTO);
     }
 
     /**
@@ -51,29 +54,39 @@ public class ArtistaService {
         log.debug("Buscando artista por ID: {}", id);
         Artista artista = artistaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Artista", id));
-        return toDTO(artista);
+        return convertToDTO(artista);
     }
 
     /**
      * Criar novo artista
+     *
+     * AUDITORIA: created_by e created_at são preenchidos automaticamente
+     * pelo Spring Data Auditing (AuditingEntityListener + AuditorAware)
      */
     @Transactional
     public ArtistaDTO criar(ArtistaDTO dto) {
-        log.info("Criando novo artista: {}", dto.nome());
+        log.info("Criando novo artista: {}", dto.getNome());
 
         Artista artista = Artista.builder()
-                .nome(dto.nome())
-                .biografia(dto.biografia())
+                .nome(dto.getNome())
+                .biografia(dto.getBiografia())
                 .build();
 
         Artista saved = artistaRepository.save(artista);
-        log.info("Artista criado com ID: {}", saved.getId());
+        log.info("Artista criado com ID: {} por usuário: {}", saved.getId(), saved.getCreatedBy());
 
-        return toDTO(saved);
+        return convertToDTO(saved);
     }
 
     /**
      * Atualizar artista existente
+     *
+     * OPTIMISTIC LOCKING:
+     * - Se dto.version != null, usa para controle de concorrência
+     * - Se outro usuário modificou o registro, JPA lança OptimisticLockException
+     * - GlobalExceptionHandler converte para HTTP 409 Conflict
+     *
+     * AUDITORIA: updated_by e updated_at são preenchidos automaticamente
      */
     @Transactional
     public ArtistaDTO atualizar(Long id, ArtistaDTO dto) {
@@ -82,13 +95,19 @@ public class ArtistaService {
         Artista artista = artistaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Artista", id));
 
-        artista.setNome(dto.nome());
-        artista.setBiografia(dto.biografia());
+        // Optimistic Locking: se frontend enviou version, usar para validação
+        // O JPA vai comparar automaticamente e lançar exceção se versões diferem
+        if (dto.getVersion() != null) {
+            artista.setVersion(dto.getVersion());
+        }
+
+        artista.setNome(dto.getNome());
+        artista.setBiografia(dto.getBiografia());
 
         Artista updated = artistaRepository.save(artista);
-        log.info("Artista atualizado: {}", updated.getId());
+        log.info("Artista atualizado: {} por usuário: {}", updated.getId(), updated.getUpdatedBy());
 
-        return toDTO(updated);
+        return convertToDTO(updated);
     }
 
     /**
@@ -107,16 +126,21 @@ public class ArtistaService {
     }
 
     /**
-     * Converter Entity para DTO (Record)
+     * Converter Entity para DTO incluindo campos de auditoria
      */
-    private ArtistaDTO toDTO(Artista artista) {
-        int totalAlbuns = artista.getAlbuns() != null ? artista.getAlbuns().size() : 0;
-
-        return new ArtistaDTO(
-                artista.getId(),
-                artista.getNome(),
-                artista.getBiografia(),
-                totalAlbuns
-        );
+    private ArtistaDTO convertToDTO(Artista artista) {
+        return ArtistaDTO.builder()
+                .id(artista.getId())
+                .nome(artista.getNome())
+                .biografia(artista.getBiografia())
+                .totalAlbuns(artista.getAlbuns() != null ? artista.getAlbuns().size() : 0)
+                // Auditoria
+                .createdAt(artista.getCreatedAt())
+                .createdBy(artista.getCreatedBy())
+                .updatedAt(artista.getUpdatedAt())
+                .updatedBy(artista.getUpdatedBy())
+                // Optimistic Locking
+                .version(artista.getVersion())
+                .build();
     }
 }

@@ -1,7 +1,6 @@
 package br.gov.mt.seplag.backend.service;
 
 import io.minio.*;
-import io.minio.http.Method;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 import jakarta.annotation.PostConstruct;
 import java.io.InputStream;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Service para operações com MinIO (S3-compatible)
@@ -19,12 +17,18 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class MinioService {
+public class MinIOService {
 
     private final MinioClient minioClient;
 
     @Value("${minio.bucket-name}")
     private String bucketName;
+
+    @Value("${minio.url}")
+    private String minioInternalUrl;
+
+    @Value("${minio.public-url}")
+    private String minioPublicUrl;
 
     @Value("${minio.presigned-url-expiry-minutes:30}")
     private int presignedUrlExpiryMinutes;
@@ -81,22 +85,12 @@ public class MinioService {
     }
 
     /**
-     * Gerar URL presigned para download
+     * Gerar URL pública para download
+     * Com bucket configurado como público, não precisa de presigned URL
      */
     public String getPresignedUrl(String fileName) {
-        try {
-            return minioClient.getPresignedObjectUrl(
-                    GetPresignedObjectUrlArgs.builder()
-                            .method(Method.GET)
-                            .bucket(bucketName)
-                            .object(fileName)
-                            .expiry(presignedUrlExpiryMinutes, TimeUnit.MINUTES)
-                            .build()
-            );
-        } catch (Exception e) {
-            log.error("Erro ao gerar URL presigned", e);
-            throw new RuntimeException("Erro ao gerar URL: " + e.getMessage());
-        }
+        // Usar URL pública direta (bucket configurado com acesso público para download)
+        return String.format("%s/%s/%s", minioPublicUrl, bucketName, fileName);
     }
 
     /**

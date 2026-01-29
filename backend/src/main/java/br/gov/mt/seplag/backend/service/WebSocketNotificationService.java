@@ -1,11 +1,12 @@
 package br.gov.mt.seplag.backend.service;
 
-import br.gov.mt.seplag.backend.dto.AlbumDTO;
-import br.gov.mt.seplag.backend.dto.WebSocketNotification;
+import br.gov.mt.seplag.backend.dto.WebSocketNotificationDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 /**
  * Service para enviar notificações WebSocket
@@ -15,52 +16,53 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class WebSocketNotificationService {
 
-    private static final String TOPIC_ALBUNS = "/topic/albuns";
-
     private final SimpMessagingTemplate messagingTemplate;
 
     /**
      * Enviar notificação de novo álbum
      */
-    public void notificarNovoAlbum(AlbumDTO album) {
-        log.info("Enviando notificação WebSocket: ALBUM_CRIADO - {}", album.titulo());
+    public void notificarNovoAlbum(Object albumDTO) {
+        log.info("Enviando notificação WebSocket: NOVO_ALBUM");
 
-        var notification = new WebSocketNotification(
-                WebSocketNotification.TipoNotificacao.ALBUM_CRIADO,
-                "Novo álbum cadastrado: " + album.titulo(),
-                album
-        );
+        WebSocketNotificationDTO notification = WebSocketNotificationDTO.builder()
+                .tipo("NOVO_ALBUM")
+                .mensagem("Novo álbum cadastrado!")
+                .dados(albumDTO)
+                .timestamp(LocalDateTime.now())
+                .build();
 
-        messagingTemplate.convertAndSend(TOPIC_ALBUNS, notification);
+        messagingTemplate.convertAndSend("/topic/albuns", notification);
     }
 
     /**
      * Enviar notificação de álbum atualizado
      */
-    public void notificarAlbumAtualizado(AlbumDTO album) {
-        log.info("Enviando notificação WebSocket: ALBUM_ATUALIZADO - {}", album.titulo());
+    public void notificarAlbumAtualizado(Object albumDTO) {
+        log.info("Enviando notificação WebSocket: ALBUM_ATUALIZADO");
 
-        var notification = new WebSocketNotification(
-                WebSocketNotification.TipoNotificacao.ALBUM_ATUALIZADO,
-                "Álbum atualizado: " + album.titulo(),
-                album
-        );
+        WebSocketNotificationDTO notification = WebSocketNotificationDTO.builder()
+                .tipo("ALBUM_ATUALIZADO")
+                .mensagem("Álbum atualizado!")
+                .dados(albumDTO)
+                .timestamp(LocalDateTime.now())
+                .build();
 
-        messagingTemplate.convertAndSend(TOPIC_ALBUNS, notification);
+        messagingTemplate.convertAndSend("/topic/albuns", notification);
     }
 
     /**
      * Enviar notificação de álbum removido
      */
     public void notificarAlbumRemovido(Long albumId) {
-        log.info("Enviando notificação WebSocket: ALBUM_REMOVIDO - ID {}", albumId);
+        log.info("Enviando notificação WebSocket: ALBUM_REMOVIDO");
 
-        var notification = new WebSocketNotification(
-                WebSocketNotification.TipoNotificacao.ALBUM_REMOVIDO,
-                "Álbum removido",
-                albumId
-        );
+        WebSocketNotificationDTO notification = WebSocketNotificationDTO.builder()
+                .tipo("ALBUM_REMOVIDO")
+                .mensagem("Álbum removido!")
+                .dados(albumId)
+                .timestamp(LocalDateTime.now())
+                .build();
 
-        messagingTemplate.convertAndSend(TOPIC_ALBUNS, notification);
+        messagingTemplate.convertAndSend("/topic/albuns", notification);
     }
 }

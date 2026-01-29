@@ -1,10 +1,6 @@
 package br.gov.mt.seplag.backend.service;
 
-
-import br.gov.mt.seplag.backend.dto.PasswordUpdateRequest;
-import br.gov.mt.seplag.backend.dto.UsuarioCreateRequest;
-import br.gov.mt.seplag.backend.dto.UsuarioResponse;
-import br.gov.mt.seplag.backend.dto.UsuarioUpdateRequest;
+import br.gov.mt.seplag.backend.dto.UsuarioDTO;
 import br.gov.mt.seplag.backend.exception.EntityNotFoundException;
 import br.gov.mt.seplag.backend.exception.ValidationException;
 import br.gov.mt.seplag.backend.model.Usuario;
@@ -16,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Service para lógica de negócio de Usuários
@@ -32,100 +29,100 @@ public class UsuarioService {
      * Listar todos os usuários
      */
     @Transactional(readOnly = true)
-    public List<UsuarioResponse> listar() {
+    public List<UsuarioDTO> listar() {
         log.debug("Listando todos os usuários");
         return usuarioRepository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     /**
      * Buscar usuário por ID
      */
     @Transactional(readOnly = true)
-    public UsuarioResponse buscarPorId(Long id) {
+    public UsuarioDTO buscarPorId(Long id) {
         log.debug("Buscando usuário por ID: {}", id);
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário", id));
-        return toResponse(usuario);
+        return convertToDTO(usuario);
     }
 
     /**
      * Buscar usuário por username
      */
     @Transactional(readOnly = true)
-    public UsuarioResponse buscarPorUsername(String username) {
+    public UsuarioDTO buscarPorUsername(String username) {
         log.debug("Buscando usuário por username: {}", username);
         Usuario usuario = usuarioRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("Usuário", username));
-        return toResponse(usuario);
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com username: " + username));
+        return convertToDTO(usuario);
     }
 
     /**
      * Criar novo usuário
      */
     @Transactional
-    public UsuarioResponse criar(UsuarioCreateRequest request) {
-        log.info("Criando novo usuário: {}", request.username());
+    public UsuarioDTO criar(UsuarioDTO dto) {
+        log.info("Criando novo usuário: {}", dto.getUsername());
 
         // Verificar se username já existe
-        if (usuarioRepository.findByUsername(request.username()).isPresent()) {
-            throw new ValidationException("Username já existe: " + request.username());
+        if (usuarioRepository.findByUsername(dto.getUsername()).isPresent()) {
+            throw new ValidationException("Username já existe: " + dto.getUsername());
         }
 
         // Encriptar senha
-        String senhaEncriptada = passwordEncoder.encode(request.password());
+        String senhaEncriptada = passwordEncoder.encode(dto.getPassword());
 
         Usuario usuario = Usuario.builder()
-                .username(request.username())
+                .username(dto.getUsername())
                 .password(senhaEncriptada)
-                .nome(request.nome())
+                .nome(dto.getNome())
                 .build();
 
         Usuario saved = usuarioRepository.save(usuario);
         log.info("Usuário criado com ID: {}", saved.getId());
 
-        return toResponse(saved);
+        return convertToDTO(saved);
     }
 
     /**
-     * Atualizar usuário existente (sem alterar senha)
+     * Atualizar usuário existente
      */
     @Transactional
-    public UsuarioResponse atualizar(Long id, UsuarioUpdateRequest request) {
+    public UsuarioDTO atualizar(Long id, UsuarioDTO dto) {
         log.info("Atualizando usuário ID: {}", id);
 
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário", id));
 
-        // Atualizar nome
-        usuario.setNome(request.nome());
+        // Atualizar campos (não atualiza password aqui)
+        usuario.setNome(dto.getNome());
 
         // Se mudou username, verificar se novo username já existe
-        if (!usuario.getUsername().equals(request.username())) {
-            if (usuarioRepository.findByUsername(request.username()).isPresent()) {
-                throw new ValidationException("Username já existe: " + request.username());
+        if (!usuario.getUsername().equals(dto.getUsername())) {
+            if (usuarioRepository.findByUsername(dto.getUsername()).isPresent()) {
+                throw new ValidationException("Username já existe: " + dto.getUsername());
             }
-            usuario.setUsername(request.username());
+            usuario.setUsername(dto.getUsername());
         }
 
         Usuario updated = usuarioRepository.save(usuario);
         log.info("Usuário atualizado: {}", updated.getId());
 
-        return toResponse(updated);
+        return convertToDTO(updated);
     }
 
     /**
      * Atualizar senha do usuário
      */
     @Transactional
-    public void atualizarSenha(Long id, PasswordUpdateRequest request) {
+    public void atualizarSenha(Long id, String novaSenha) {
         log.info("Atualizando senha do usuário ID: {}", id);
 
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário", id));
 
-        String senhaEncriptada = passwordEncoder.encode(request.novaSenha());
+        String senhaEncriptada = passwordEncoder.encode(novaSenha);
         usuario.setPassword(senhaEncriptada);
 
         usuarioRepository.save(usuario);
@@ -156,13 +153,14 @@ public class UsuarioService {
     }
 
     /**
-     * Converter Entity para Response (nunca expõe password)
+     * Converter Entity para DTO
      */
-    private UsuarioResponse toResponse(Usuario usuario) {
-        return new UsuarioResponse(
-                usuario.getId(),
-                usuario.getUsername(),
-                usuario.getNome()
-        );
+    private UsuarioDTO convertToDTO(Usuario usuario) {
+        return UsuarioDTO.builder()
+                .id(usuario.getId())
+                .username(usuario.getUsername())
+                .nome(usuario.getNome())
+                // NÃO retornar password no DTO!
+                .build();
     }
 }

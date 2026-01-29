@@ -33,11 +33,11 @@ public class RegionalService {
             if (ativa != null) {
                 return cb.equal(root.get("ativa"), ativa);
             }
-            return cb.conjunction();
+            return cb.conjunction(); // Sempre verdadeiro se não houver filtro
         };
 
         return regionalRepository.findAll(spec, pageable)
-                .map(this::toDTO);
+                .map(this::convertToDTO);
     }
 
     /**
@@ -48,7 +48,7 @@ public class RegionalService {
         log.debug("Buscando regional por ID: {}", id);
         Regional regional = regionalRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Regional", id));
-        return toDTO(regional);
+        return convertToDTO(regional);
     }
 
     /**
@@ -58,20 +58,20 @@ public class RegionalService {
     public RegionalDTO buscarPorCodigoExterno(Integer codigoExterno) {
         log.debug("Buscando regional por código externo: {}", codigoExterno);
         Regional regional = regionalRepository.findByCodigoExterno(codigoExterno)
-                .orElseThrow(() -> new EntityNotFoundException("Regional", "código externo: " + codigoExterno));
-        return toDTO(regional);
+                .orElseThrow(() -> new EntityNotFoundException("Regional não encontrada com código externo: " + codigoExterno));
+        return convertToDTO(regional);
     }
 
     /**
-     * Converter Entity para DTO (Record)
+     * Converter Entity para DTO
      */
-    private RegionalDTO toDTO(Regional regional) {
-        return new RegionalDTO(
-                regional.getId(),
-                regional.getCodigoExterno(),
-                regional.getNome(),
-                regional.getAtiva(),
-                regional.getUltimaSincronizacao()
-        );
+    private RegionalDTO convertToDTO(Regional regional) {
+        return RegionalDTO.builder()
+                .id(regional.getId())
+                .codigoExterno(regional.getCodigoExterno())
+                .nome(regional.getNome())
+                .ativa(regional.getAtiva())
+                .ultimaSincronizacao(regional.getUltimaSincronizacao())
+                .build();
     }
 }
