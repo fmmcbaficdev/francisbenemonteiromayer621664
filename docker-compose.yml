@@ -177,13 +177,15 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:8080}
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8080}
+        VITE_WS_URL: ${VITE_WS_URL:-http://localhost:8080/ws}
 
     container_name: ${COMPOSE_PROJECT_NAME:-seplag}-frontend
     restart: unless-stopped
 
     environment:
-      REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:8080}
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8080}
+      VITE_WS_URL: ${VITE_WS_URL:-http://localhost:8080/ws}
 
     ports:
       - "${FRONTEND_PORT:-3000}:80"

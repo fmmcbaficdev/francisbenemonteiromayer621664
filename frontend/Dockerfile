@@ -14,6 +14,12 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Build args (Vite usa VITE_* em tempo de build)
+ARG VITE_API_URL=http://localhost:8080
+ARG VITE_WS_URL=http://localhost:8080/ws
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_WS_URL=$VITE_WS_URL
+
 # Build
 RUN npm run build
 
