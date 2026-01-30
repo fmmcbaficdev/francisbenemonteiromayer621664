@@ -41,6 +41,8 @@ public class AlbumDTO {
     private List<ArtistaDTO> artistas; // Resposta
 
     private List<String> imagensUrls; // URLs presigned do MinIO
+    /** IDs das imagens de capa (mesma ordem que imagensUrls), para permitir exclusão individual */
+    private List<Long> imagensCapaIds;
 
 // ═══════════════════════════════════════════════════════════
     // AUDITORIA - Retornados na resposta (não enviados na request)

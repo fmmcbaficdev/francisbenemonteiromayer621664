@@ -2,6 +2,7 @@
 // LOGIN PAGE - POLÍCIA CIVIL MT
 // ==========================================
 
+import '../index.css';
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Shield, User, Lock, Eye, EyeOff, AlertCircle, LogIn } from 'lucide-react';
@@ -57,7 +58,7 @@ export function Login() {
             <Shield className="w-10 h-10 text-gold-400" />
           </div>
           <h1 className="text-2xl font-bold text-primary-900">SEPLAG</h1>
-          <p className="text-primary-700 font-medium">Polícia Civil do Mato Grosso</p>
+          <p className="text-primary-700 font-medium">Secretaria de Planejamento e Gestão </p>
         </div>
 
         {/* Form */}

@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -279,6 +280,29 @@ public class AlbumService {
     }
 
     /**
+     * Remove uma imagem de capa do álbum (MinIO + banco).
+     * Lança EntityNotFoundException se o álbum ou a imagem não existir ou a imagem não pertencer ao álbum.
+     */
+    @Transactional
+    public void deletarImagem(Long albumId, Long imagemId) {
+        Album album = albumRepository.findById(albumId)
+                .orElseThrow(() -> new EntityNotFoundException("Álbum", albumId));
+        ImagemCapa imagem = imagemCapaRepository.findById(imagemId)
+                .orElseThrow(() -> new EntityNotFoundException("Imagem de capa", imagemId));
+        if (!imagem.getAlbum().getId().equals(albumId)) {
+            throw new EntityNotFoundException("Imagem não pertence a este álbum");
+        }
+        try {
+            minIOService.deleteFile(imagem.getCaminhoMinIO());
+        } catch (Exception e) {
+            log.warn("Erro ao remover arquivo do MinIO ({}), removendo registro do banco: {}", imagem.getCaminhoMinIO(), e.getMessage());
+        }
+        imagemCapaRepository.delete(imagem);
+        log.info("Imagem {} removida do álbum {}", imagemId, albumId);
+        webSocketService.notificarAlbumAtualizado(album);
+    }
+
+    /**
      * Validar se arquivo é uma imagem
      */
     private boolean isImageFile(MultipartFile file) {
@@ -297,12 +321,17 @@ public class AlbumService {
                         .build())
                 .collect(Collectors.toList());
 
-        // Buscar imagens do álbum e gerar URLs presigned
+        // Buscar imagens do álbum (ordem estável por id) e gerar URLs presigned
         List<String> imagensUrls = new ArrayList<>();
+        List<Long> imagensCapaIds = new ArrayList<>();
         if (album.getImagensCapa() != null && !album.getImagensCapa().isEmpty()) {
-            imagensUrls = album.getImagensCapa().stream()
+            List<ImagemCapa> ordenadas = album.getImagensCapa().stream()
+                    .sorted(Comparator.comparing(ImagemCapa::getId))
+                    .collect(Collectors.toList());
+            imagensUrls = ordenadas.stream()
                     .map(img -> minIOService.getPresignedUrl(img.getCaminhoMinIO()))
                     .collect(Collectors.toList());
+            imagensCapaIds = ordenadas.stream().map(ImagemCapa::getId).collect(Collectors.toList());
         }
 
         return AlbumDTO.builder()
@@ -312,6 +341,7 @@ public class AlbumService {
                 .descricao(album.getDescricao())
                 .artistas(artistasDTO)
                 .imagensUrls(imagensUrls)
+                .imagensCapaIds(imagensCapaIds)
                 // Auditoria
                 .createdAt(album.getCreatedAt())
                 .createdBy(album.getCreatedBy())
