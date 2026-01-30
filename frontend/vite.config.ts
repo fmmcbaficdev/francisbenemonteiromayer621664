@@ -7,6 +7,7 @@ export default defineConfig({
   define: {
     global: 'globalThis',
   },
+  // Vitest (tipos via reference types="vitest"); build do Vite ignora "test"
   test: {
     globals: true,
     environment: 'jsdom',
@@ -31,5 +32,5 @@ export default defineConfig({
         ws: true,
       }
     }
-  }
-})
+  },
+} as import('vite').UserConfig & { test?: unknown })
