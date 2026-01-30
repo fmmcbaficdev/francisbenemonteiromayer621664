@@ -43,14 +43,18 @@ export function Regionais() {
     try {
       const result = await regionaisApi.sincronizar();
       if (result.sucesso) {
-        toast.success(result.mensagem);
+        const stats = result.estatisticas;
+        const detalhe = stats
+          ? ` (${stats.criados} criadas, ${stats.atualizados} atualizadas, ${stats.totalAPI} na API)`
+          : '';
+        toast.success(result.mensagem + detalhe);
         fetchRegionais();
       } else {
-        toast.error(result.mensagem);
+        toast.error(result.mensagem || 'Sincronização falhou. Verifique os logs do backend e EXTERNAL_REGIONAIS_API_URL no .env');
       }
     } catch (error) {
       console.error('Erro ao sincronizar:', error);
-      toast.error('Erro ao sincronizar regionais');
+      toast.error('Erro ao sincronizar. Verifique se o backend consegue acessar a API externa (ver logs).');
     } finally {
       setSyncing(false);
     }

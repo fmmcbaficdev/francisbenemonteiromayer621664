@@ -10,7 +10,7 @@ import {
   clearTokens,
   isTokenExpiringSoon 
 } from '../../utils/storage';
-import type { AuthResponse, Artista, ArtistaForm, ArtistaResumo, Album, AlbumForm, AlbumResumo, Page, Regional } from '../model/types';
+import type { AuthResponse, Artista, ArtistaForm, ArtistaResumo, Album, AlbumForm, AlbumResumo, Page, Regional, SyncRegionaisResult } from '../model/types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -191,8 +191,8 @@ export const regionaisApi = {
     return response.data.content;
   },
   
-  sincronizar: async (): Promise<{ sucesso: boolean; mensagem: string }> => {
-    const response = await api.post('/v1/regionais/sincronizar');
+  sincronizar: async (): Promise<SyncRegionaisResult> => {
+    const response = await api.post<SyncRegionaisResult>('/v1/regionais/sincronizar');
     return response.data;
   },
 };

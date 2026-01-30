@@ -125,6 +125,23 @@ export interface ApiError {
 }
 
 // ==========================================
+// SYNC REGIONAIS RESULT
+// ==========================================
+export interface SyncRegionaisResult {
+  sucesso: boolean;
+  mensagem: string;
+  estatisticas?: {
+    criados: number;
+    atualizados: number;
+    desativados: number;
+    semMudancas: number;
+    totalAPI: number;
+    totalBanco: number;
+    duracaoMs: number;
+  };
+}
+
+// ==========================================
 // REGIONAL
 // ==========================================
 export interface Regional {
