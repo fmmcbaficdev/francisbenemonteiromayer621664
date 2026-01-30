@@ -70,6 +70,8 @@ export interface Album extends Auditable {
   descricao?: string;
   artistas: ArtistaResumo[];
   imagensUrls?: string[];
+  /** IDs das imagens de capa (mesma ordem que imagensUrls), para exclusão individual */
+  imagensCapaIds?: number[];
 }
 
 export interface AlbumResumo {

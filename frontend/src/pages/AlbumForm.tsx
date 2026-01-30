@@ -74,7 +74,9 @@ export function AlbumForm() {
   // Upload state
   const [files, setFiles] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [existingImageIds, setExistingImageIds] = useState<number[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [removingImageId, setRemovingImageId] = useState<number | null>(null);
 
   // ==========================================
   // FETCH DATA
@@ -97,6 +99,7 @@ export function AlbumForm() {
             artistasIds: album.artistas.map(a => a.id),
           });
           setExistingImages(album.imagensUrls || []);
+          setExistingImageIds(album.imagensCapaIds || []);
         }
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
@@ -155,8 +158,26 @@ export function AlbumForm() {
     setFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const removeExistingImage = (index: number) => {
-    setExistingImages(prev => prev.filter((_, i) => i !== index));
+  const removeExistingImage = async (index: number) => {
+    if (!id) return;
+    const imagemId = existingImageIds[index];
+    if (imagemId == null) {
+      setExistingImages(prev => prev.filter((_, i) => i !== index));
+      setExistingImageIds(prev => prev.filter((_, i) => i !== index));
+      return;
+    }
+    setRemovingImageId(imagemId);
+    try {
+      await albunsApi.deletarImagem(Number(id), imagemId);
+      setExistingImages(prev => prev.filter((_, i) => i !== index));
+      setExistingImageIds(prev => prev.filter((_, i) => i !== index));
+      toast.success('Imagem removida.');
+    } catch (err) {
+      console.error('Erro ao remover imagem:', err);
+      toast.error('Erro ao remover imagem.');
+    } finally {
+      setRemovingImageId(null);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -365,10 +386,15 @@ export function AlbumForm() {
                       <button
                         type="button"
                         onClick={() => removeExistingImage(index)}
-                        className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        disabled={removingImageId === existingImageIds[index]}
+                        className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-70"
                         aria-label={`Remover imagem ${index + 1}`}
                       >
-                        <X className="w-4 h-4" />
+                        {removingImageId === existingImageIds[index] ? (
+                          <Loading size="sm" />
+                        ) : (
+                          <X className="w-4 h-4" />
+                        )}
                       </button>
                     </div>
                   ))}

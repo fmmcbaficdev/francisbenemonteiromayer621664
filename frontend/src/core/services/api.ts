@@ -182,6 +182,10 @@ export const albunsApi = {
     });
     return response.data;
   },
+
+  deletarImagem: async (albumId: number, imagemId: number): Promise<void> => {
+    await api.delete(`/v1/albuns/${albumId}/imagens/${imagemId}`);
+  },
 };
 
 // REGIONAIS API
