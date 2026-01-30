@@ -299,7 +299,8 @@ public class AlbumService {
         }
         imagemCapaRepository.delete(imagem);
         log.info("Imagem {} removida do álbum {}", imagemId, albumId);
-        webSocketService.notificarAlbumAtualizado(album);
+        Album albumAtualizado = albumRepository.findByIdWithImagens(albumId).orElse(album);
+        webSocketService.notificarAlbumAtualizado(convertToDTO(albumAtualizado));
     }
 
     /**

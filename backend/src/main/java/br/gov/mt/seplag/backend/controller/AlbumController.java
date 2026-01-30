@@ -142,4 +142,19 @@ public class AlbumController {
         UploadImagemResponseDTO response = albumService.uploadImagens(albumId, files);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    /**
+     * DELETE /v1/albuns/{albumId}/imagens/{imagemId}
+     * Remove uma imagem de capa do álbum (MinIO + banco).
+     */
+    @DeleteMapping("/{albumId}/imagens/{imagemId}")
+    @Operation(summary = "Remover imagem de capa", description = "Remove uma imagem do álbum (arquivo no MinIO e registro no banco)")
+    public ResponseEntity<Void> deletarImagem(
+            @PathVariable Long albumId,
+            @PathVariable Long imagemId
+    ) {
+        log.info("DELETE /v1/albuns/{}/imagens/{}", albumId, imagemId);
+        albumService.deletarImagem(albumId, imagemId);
+        return ResponseEntity.noContent().build();
+    }
 }
