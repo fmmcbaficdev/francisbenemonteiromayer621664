@@ -11,8 +11,12 @@ import {
   Menu, 
   X, 
   User,
-  MapPin 
+  MapPin,
+  FileCode
 } from 'lucide-react';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const SWAGGER_URL = `${API_BASE_URL.replace(/\/$/, '')}/swagger-ui.html`;
 import { useAuth } from '../context/AuthContext';
 
 export function Navbar() {
@@ -71,6 +75,16 @@ export function Navbar() {
 
           {/* User Menu */}
           <div className="hidden md:flex items-center gap-4">
+            <a
+              href={SWAGGER_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors text-sm"
+              title="Abrir documentação da API (Swagger)"
+            >
+              <FileCode className="w-5 h-5" />
+              API (Swagger)
+            </a>
             <div className="flex items-center gap-2 text-gray-600">
               <User className="w-5 h-5" />
               <span className="text-sm font-medium">{user?.nome || user?.username}</span>
@@ -122,6 +136,16 @@ export function Navbar() {
               </Link>
             ))}
             
+            <a
+              href={SWAGGER_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg"
+            >
+              <FileCode className="w-5 h-5" />
+              API (Swagger)
+            </a>
             <hr className="my-2" />
             
             <div className="flex items-center gap-2 px-4 py-2 text-gray-600">

@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Shield, User, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Shield, User, Lock, Eye, EyeOff, AlertCircle, LogIn } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Loading } from '../components/Loading';
 
@@ -81,15 +81,15 @@ export function Login() {
                 Usuário
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <User className="w-5 h-5 text-primary-400" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-primary-400">
+                  <User className="w-5 h-5" />
                 </div>
                 <input
                   id="username"
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="input pl-12"
+                  className="input w-full py-3 pr-4 pl-11 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white"
                   placeholder="Digite seu usuário"
                   required
                   autoComplete="username"
@@ -104,15 +104,15 @@ export function Login() {
                 Senha
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Lock className="w-5 h-5 text-primary-400" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-primary-400">
+                  <Lock className="w-5 h-5" />
                 </div>
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="input pl-12 pr-12"
+                  className="input w-full py-3 pl-11 pr-12 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white"
                   placeholder="Digite sua senha"
                   required
                   autoComplete="current-password"
@@ -120,9 +120,10 @@ export function Login() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-primary-400 hover:text-primary-600"
+                  className="absolute inset-y-0 right-0 w-12 h-full flex items-center justify-center text-primary-400 hover:text-primary-600 focus:outline-none focus:ring-0"
+                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? <EyeOff className="w-5 h-5 shrink-0" /> : <Eye className="w-5 h-5 shrink-0" />}
                 </button>
               </div>
             </div>
@@ -140,7 +141,7 @@ export function Login() {
                 </>
               ) : (
                 <>
-                  <Shield className="w-5 h-5" />
+                  <LogIn className="w-5 h-5 shrink-0" />
                   Entrar no Sistema
                 </>
               )}
