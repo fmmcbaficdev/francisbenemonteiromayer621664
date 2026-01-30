@@ -15,6 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -302,11 +303,12 @@ public class RegionalSyncService {
         try {
             WebClient webClient = webClientBuilder.build();
 
-            log.debug("  → Realizando chamada HTTP GET...");
+            log.info("  → Chamando API externa GET {} ...", apiUrl);
             List<RegionalExternaDTO> regionais = webClient.get()
                     .uri(apiUrl)
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<List<RegionalExternaDTO>>() {})
+                    .timeout(Duration.ofSeconds(30))
                     .block();
 
             if (regionais == null) {
@@ -314,12 +316,12 @@ public class RegionalSyncService {
                 return Collections.emptyList();
             }
 
-            log.debug("  ✓ {} regionais recebidas da API", regionais.size());
+            log.info("  ✓ {} regionais recebidas da API", regionais.size());
             return regionais;
 
         } catch (Exception e) {
-            log.error("  ✗ ERRO ao buscar regionais da API: {}", e.getMessage());
-            log.error("  Stack trace:", e);
+            log.error("  ✗ ERRO ao buscar regionais da API: {} - {}", e.getClass().getSimpleName(), e.getMessage());
+            log.error("  Causa: verifique conectividade (rede/DNS/SSL) e URL: {}", apiUrl, e);
             return Collections.emptyList();
         }
     }

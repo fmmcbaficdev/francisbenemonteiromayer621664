@@ -1,9 +1,9 @@
 # 🎵 Sistema de Gerenciamento de Artistas e Álbuns
-**Projeto Prático - Concurso Público SEPLAG/MT 2025**
+**Projeto Prático - Concurso Público SEPLAG/MT 2026 (PSS 001/2026)**
 
 ## 📋 Identificação
 - **Candidato:** Francisbene Monteiro Mayer
-- **Inscrição:** [Número de Inscrição]
+- **Inscrição:** (informar no ato da inscrição no SIES)
 - **Vaga:** Analista de TI - Desenvolvimento Full Stack Sênior
 - **Cargo:** Analista de Sistemas
 - **Email:** fmmcba1@gmail.com
@@ -49,22 +49,23 @@ Sistema full stack para gerenciamento de artistas musicais e seus álbuns, com a
 - **Testes:** JUnit 5, Mockito, Spring Security Test
 
 #### Frontend
-- **Framework:** React 18.2
-- **Linguagem:** TypeScript 5.3
-- **Build Tool:** Vite 5.0
-- **Estilização:** Tailwind CSS 3.4
-- **State Management:** RxJS 7.8 (BehaviorSubject para estados globais)
-- **HTTP Client:** Axios 1.6
-- **Form Validation:** React Hook Form 7 + Zod 3
-- **Data Fetching & Cache:** TanStack Query v5 (React Query)
-- **WebSocket:** STOMP.js 7 + SockJS 1.6
-- **Routing:** React Router 6.20 (Lazy Loading)
-- **Testes:** Vitest + React Testing Library (RTL)
-- **Padronização:** ESLint + Prettier
+- **Framework:** React 19.x
+- **Linguagem:** TypeScript 5.x
+- **Build Tool:** Vite 7.x
+- **Estilização:** Tailwind CSS 4.x
+- **State Management:** RxJS 7.x (BehaviorSubject para estados globais)
+- **HTTP Client:** Axios
+- **Form Validation:** React Hook Form + Zod (peer)
+- **WebSocket:** STOMP.js 7 + SockJS
+- **Routing:** React Router 7.x (Lazy Loading)
+- **Testes:** Configuração para Vitest + React Testing Library (ver seção Testes)
+- **Padronização:** ESLint
 
 ---
 
 ## 🚀 Como Executar
+
+> **Para o avaliador:** use o guia **[COMO_ABRIR_PARA_AVALIADOR.md](COMO_ABRIR_PARA_AVALIADOR.md)** — passos mínimos para abrir o projeto sem erros.
 
 ### Pré-requisitos
 - Docker 24.0+ e Docker Compose 2.20+
@@ -77,15 +78,14 @@ Sistema full stack para gerenciamento de artistas musicais e seus álbuns, com a
 git clone https://github.com/fmmcbaficdev/francisbenemonteiromayer621664
 cd francisbenemonteiromayer621664
 
-# 2. Configurar variáveis de ambiente
+# 2. Configurar variáveis de ambiente (não é necessário editar — valores do .env.example funcionam)
 cp .env.example .env
-# Edite .env se necessário (valores padrão já funcionam)
 
 # 3. Subir todos os serviços
-docker-compose up --build -d
+docker compose up --build -d
 
 # 4. Aguardar inicialização (1-2 minutos)
-docker-compose logs -f backend
+docker compose logs -f backend
 ```
 
 ### Acessos
@@ -95,8 +95,8 @@ docker-compose logs -f backend
 | **Frontend** | http://localhost:3000 | admin / admin123 |
 | **Backend API** | http://localhost:8080 | - |
 | **Swagger UI** | http://localhost:8080/swagger-ui.html | - |
-| **MinIO Console** | http://localhost:9001 | minioadmin / minioadmin123 |
-| **PostgreSQL** | localhost:5432 | postgres / postgres123 |
+| **MinIO Console** | http://localhost:9001 | minioadmin / minioadmin123 (se usou .env.example) |
+| **PostgreSQL** | localhost:5432 | seplag / seplag123 (se usou .env.example) |
 
 ### Verificação de Saúde
 ```bash
@@ -418,14 +418,10 @@ cd backend
 ./mvnw test jacoco:report      # Cobertura de código
 ```
 
-**Cobertura Esperada:** 80%+
+**Cobertura esperada:** 80%+ (módulos principais).
 
 ### Frontend
-```bash
-cd frontend
-npm test                       # Testes unitários
-npm run test:coverage          # Cobertura
-```
+O frontend está preparado para testes com Vitest e React Testing Library. Para adicionar testes, instale as dependências (`vitest`, `@testing-library/react`, `jsdom`) e configure o script `test` no `package.json`. Os componentes e facades são testáveis de forma isolada.
 
 ---
 
