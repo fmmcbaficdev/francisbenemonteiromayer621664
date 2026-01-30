@@ -65,7 +65,7 @@ Sistema full stack para gerenciamento de artistas musicais e seus álbuns, com a
 
 ## 🚀 Como Executar
 
-> **Para o avaliador:** use o guia **[COMO_ABRIR_PARA_AVALIADOR.md](COMO_ABRIR_PARA_AVALIADOR.md)** — passos mínimos para abrir o projeto sem erros.
+> **Para o avaliador:** use o guia **[COMO_ABRIR_PARA_AVALIADOR.md](docs/COMO_ABRIR_PARA_AVALIADOR.md)** — passos mínimos para abrir o projeto sem erros.
 
 ### Pré-requisitos
 - Docker 24.0+ e Docker Compose 2.20+
@@ -421,7 +421,13 @@ cd backend
 **Cobertura esperada:** 80%+ (módulos principais).
 
 ### Frontend
-O frontend está preparado para testes com Vitest e React Testing Library. Para adicionar testes, instale as dependências (`vitest`, `@testing-library/react`, `jsdom`) e configure o script `test` no `package.json`. Os componentes e facades são testáveis de forma isolada.
+```bash
+cd frontend
+npm test                # Testes unitários (Vitest + React Testing Library)
+npm run test:coverage   # Cobertura de código
+```
+
+Testes em `src/components/Loading.test.tsx` e `src/pages/Login.test.tsx` (Vitest + RTL).
 
 ---
 
