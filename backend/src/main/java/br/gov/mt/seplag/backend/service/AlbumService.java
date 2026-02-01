@@ -44,7 +44,7 @@ public class AlbumService {
     private final ArtistaRepository artistaRepository;
     private final ImagemCapaRepository imagemCapaRepository;
     private final WebSocketNotificationService webSocketService;
-    private final MinIOService minIOService;
+    private final MinioService minIOService;
 
     /**
      * Listar todos os álbuns

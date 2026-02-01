@@ -47,7 +47,7 @@ class AlbumServiceTest {
     private WebSocketNotificationService webSocketService;
 
     @Mock
-    private MinIOService minIOService;
+    private MinioService minIOService;
 
     @InjectMocks
     private AlbumService albumService;
