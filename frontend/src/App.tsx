@@ -11,6 +11,7 @@ import { PrivateRoute, Loading } from './components';
 const Login = lazy(() => import('./pages/Login'));
 const Artistas = lazy(() => import('./pages/Artistas'));
 const ArtistaForm = lazy(() => import('./pages/ArtistaForm'));
+const ArtistaDetalhes = lazy(() => import('./pages/ArtistaDetalhes'));
 const Albuns = lazy(() => import('./pages/Albuns'));
 const AlbumForm = lazy(() => import('./pages/AlbumForm'));
 const Regionais = lazy(() => import('./pages/Regionais'));
@@ -30,6 +31,9 @@ function App() {
             } />
             <Route path="/artistas/novo" element={
               <PrivateRoute><ArtistaForm /></PrivateRoute>
+            } />
+            <Route path="/artistas/:id" element={
+              <PrivateRoute><ArtistaDetalhes /></PrivateRoute>
             } />
             <Route path="/artistas/:id/editar" element={
               <PrivateRoute><ArtistaForm /></PrivateRoute>

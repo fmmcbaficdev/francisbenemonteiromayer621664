@@ -155,12 +155,17 @@ export function Artistas() {
                   {artistas.map((artista) => (
                     <tr key={artista.id} className="table-row">
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-4">
+                        <Link 
+                          to={`/artistas/${artista.id}`}
+                          className="flex items-center gap-4 hover:bg-primary-50 -mx-2 px-2 py-2 rounded-lg transition-colors"
+                        >
                           <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
                             <Music className="w-6 h-6 text-primary-600" />
                           </div>
-                          <span className="font-semibold text-gray-900">{artista.nome}</span>
-                        </div>
+                          <span className="font-semibold text-primary-600 hover:text-primary-700">
+                            {artista.nome}
+                          </span>
+                        </Link>
                       </td>
                       <td className="px-6 py-4 text-center">
                         <span className="badge-gold">

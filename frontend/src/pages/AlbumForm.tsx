@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft,
   Save,
@@ -57,8 +57,10 @@ function FilePreviewList({ files, onRemove }: { files: File[]; onRemove: (index:
 
 export function AlbumForm() {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const isEditing = Boolean(id);
   const navigate = useNavigate();
+  const artistaIdFromUrl = searchParams.get('artistaId');
 
   // State
   const [loading, setLoading] = useState(true);
@@ -100,6 +102,15 @@ export function AlbumForm() {
           });
           setExistingImages(album.imagensUrls || []);
           setExistingImageIds(album.imagensCapaIds || []);
+        } else if (artistaIdFromUrl) {
+          // Pré-selecionar artista quando vier da URL
+          const artistaId = Number(artistaIdFromUrl);
+          if (!isNaN(artistaId)) {
+            setFormData(prev => ({
+              ...prev,
+              artistasIds: [artistaId],
+            }));
+          }
         }
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
@@ -110,7 +121,7 @@ export function AlbumForm() {
       }
     };
     fetchData();
-  }, [id, isEditing, navigate]);
+  }, [id, isEditing, artistaIdFromUrl, navigate]);
 
   // ==========================================
   // HANDLERS

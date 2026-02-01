@@ -155,6 +155,16 @@ export const albunsApi = {
     return response.data;
   },
   
+  buscarPorArtista: async (artistaId: number, page = 0, size = 100): Promise<Page<AlbumResumo>> => {
+    const params = new URLSearchParams({ 
+      page: String(page), 
+      size: String(size),
+      sort: 'titulo,asc'
+    });
+    const response = await api.get<Page<AlbumResumo>>(`/v1/albuns/artista/${artistaId}?${params}`);
+    return response.data;
+  },
+  
   buscarPorId: async (id: number): Promise<Album> => {
     const response = await api.get<Album>(`/v1/albuns/${id}`);
     return response.data;
