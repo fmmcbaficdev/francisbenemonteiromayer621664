@@ -89,3 +89,14 @@ curl -s http://localhost:8080/actuator/health/liveness
 4. Abrir http://localhost:3001 (ou 3002) → login **admin** / **admin123**  
 
 Com isso o projeto deve abrir e rodar sem erros para avaliação.
+
+---
+
+## Sobre as imagens de capa dos álbuns
+
+As **capas dos álbuns** são armazenadas no **MinIO** (objeto por objeto), não no banco. O banco guarda só o **caminho** da imagem (tabela `imagens_capa`). Por isso:
+
+- Em **outra máquina** ou em um **novo clone** do repositório, o MinIO sobe **vazio** (volume novo). Os artistas e álbuns vêm do seed (Flyway), mas **não há imagens de capa** até alguém fazer upload.
+- Isso é esperado: o edital pede “upload de uma ou mais imagens” e “recuperar via presigned URL”; a persistência é no MinIO por ambiente. Em uma máquina nova, o avaliador **pode testar o upload** na tela de edição de um álbum (adicionar capa, salvar) e as imagens passam a aparecer e a persistir enquanto o ambiente (Docker/volumes) for o mesmo.
+
+**Resumo:** No primeiro acesso (ou em outra máquina), não haverá capas pré-carregadas. O avaliador pode verificar o requisito de upload indo em **Álbuns → Editar um álbum → enviar uma ou mais imagens**; após o upload, as capas ficam no MinIO e aparecem na listagem e no detalhe.

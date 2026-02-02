@@ -98,6 +98,8 @@ docker compose logs -f backend
 | **MinIO Console** | http://localhost:9001 | minioadmin / minioadmin123 (se usou .env.example) |
 | **PostgreSQL** | localhost:5432 | seplag / seplag123 (se usou .env.example) |
 
+**Nota:** As imagens de capa dos álbuns ficam no MinIO (volume Docker). Em outro clone ou outra máquina, o MinIO sobe vazio — artistas e álbuns vêm do seed, mas as capas só aparecem após upload pela tela de edição do álbum (requisito do edital: upload e presigned URL).
+
 ### Verificação de Saúde
 ```bash
 # Backend
