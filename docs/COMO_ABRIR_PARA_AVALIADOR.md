@@ -7,7 +7,7 @@ Este guia garante que o avaliador consiga subir e testar o projeto em poucos pas
 ## Pré-requisitos
 
 - **Docker** e **Docker Compose** instalados (versão recente)
-- **Portas livres:** 3000, 8080, 5432, 9000, 9001
+- **Portas livres:** 3001 e 3002 (frontend), 8080, 5432, 9000, 9001
 - **~4 GB RAM** disponível
 
 ---
@@ -62,7 +62,7 @@ curl -s http://localhost:8080/actuator/health/liveness
 
 ### 6. Acessar a aplicação
 
-- **Frontend:** http://localhost:3000  
+- **Frontend:** http://localhost:3001 (ou http://localhost:3002 se 3001 estiver em uso)  
 - **Login:** `admin` / `admin123`  
 - **Swagger:** http://localhost:8080/swagger-ui.html — ou use o link **API (Swagger)** no menu do frontend (abre em nova aba). Para passo a passo de testes via Swagger (login, Authorize com JWT, endpoints), veja [TESTES_VIA_SWAGGER.md](TESTES_VIA_SWAGGER.md).
 
@@ -72,10 +72,12 @@ curl -s http://localhost:8080/actuator/health/liveness
 
 | Problema | O que fazer |
 |----------|-------------|
-| Porta em uso | Verifique se 3000, 8080, 5432, 9000 ou 9001 estão livres. Feche outros containers ou aplicações que usem essas portas. |
+| Porta em uso | O frontend usa **3001 e 3002** (duas portas); use a que estiver livre. Se 3001 e 3002 estiverem ocupadas, veja [PROBLEMAS_COMUNS_AVALIADOR.md](PROBLEMAS_COMUNS_AVALIADOR.md). |
 | Backend não fica (healthy) | Veja os logs: `docker compose logs backend`. Erros comuns: falha ao conectar no Postgres (confira POSTGRES_* no .env) ou JWT_SECRET muito curto (use o valor do .env.example). |
 | Frontend não carrega | Confirme se o backend está healthy e se acessa http://localhost:8080. O front chama a API em 8080. |
 | Só 3 regionais na tela | Clique em **Sincronizar** na tela Regionais. A sincronização também roda na subida do backend; se a API externa estiver lenta ou indisponível na hora, pode ter ficado só o seed. |
+
+**Mais situações e soluções:** [PROBLEMAS_COMUNS_AVALIADOR.md](PROBLEMAS_COMUNS_AVALIADOR.md) — esqueceu o `.env`, primeira subida lenta, 429, upload, Windows, etc.
 
 ---
 
@@ -84,6 +86,6 @@ curl -s http://localhost:8080/actuator/health/liveness
 1. `cp .env.example .env`  
 2. `docker compose up --build -d`  
 3. Aguardar 1–2 min (logs do backend até "Started")  
-4. Abrir http://localhost:3000 → login **admin** / **admin123**  
+4. Abrir http://localhost:3001 (ou 3002) → login **admin** / **admin123**  
 
 Com isso o projeto deve abrir e rodar sem erros para avaliação.

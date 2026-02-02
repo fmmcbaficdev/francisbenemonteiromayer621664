@@ -65,11 +65,11 @@ Sistema full stack para gerenciamento de artistas musicais e seus álbuns, com a
 
 ## 🚀 Como Executar
 
-> **Para o avaliador:** use o guia **[COMO_ABRIR_PARA_AVALIADOR.md](docs/COMO_ABRIR_PARA_AVALIADOR.md)** — passos mínimos para abrir o projeto sem erros.
+> **Para o avaliador:** use o guia **[COMO_ABRIR_PARA_AVALIADOR.md](docs/COMO_ABRIR_PARA_AVALIADOR.md)** — passos mínimos para abrir o projeto sem erros. Em caso de problemas ao executar, consulte **[PROBLEMAS_COMUNS_AVALIADOR.md](docs/PROBLEMAS_COMUNS_AVALIADOR.md)**. Revisão item a item conforme o edital (Anexo II-C): **[REVISAO_EDITAL_ANEXO_IIC.md](docs/REVISAO_EDITAL_ANEXO_IIC.md)**.
 
 ### Pré-requisitos
 - Docker 24.0+ e Docker Compose 2.20+
-- Portas livres: 3000, 8080, 5432, 9000, 9001
+- Portas livres: **3001 e 3002** (frontend), 8080, 5432, 9000, 9001
 - Mínimo 4GB RAM disponível
 
 ### Execução em 3 Passos
@@ -92,7 +92,7 @@ docker compose logs -f backend
 
 | Serviço | URL | Credenciais |
 |---------|-----|-------------|
-| **Frontend** | http://localhost:3000 | admin / admin123 |
+| **Frontend** | http://localhost:3001 ou http://localhost:3002 | admin / admin123 |
 | **Backend API** | http://localhost:8080 | - |
 | **Swagger UI** | http://localhost:8080/swagger-ui.html | - |
 | **MinIO Console** | http://localhost:9001 | minioadmin / minioadmin123 (se usou .env.example) |
@@ -104,7 +104,7 @@ docker compose logs -f backend
 curl http://localhost:8080/actuator/health
 
 # Frontend
-curl http://localhost:3000
+curl http://localhost:3001
 
 # MinIO
 curl http://localhost:9000/minio/health/live
