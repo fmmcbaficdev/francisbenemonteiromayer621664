@@ -187,8 +187,10 @@ services:
       VITE_API_URL: ${VITE_API_URL:-http://localhost:8080}
       VITE_WS_URL: ${VITE_WS_URL:-http://localhost:8080/ws}
 
+    # Duas portas fixas: se 3001 estiver ocupada, use 3002. Evita conflito com a 3000 (comum em dev).
     ports:
-      - "${FRONTEND_PORT:-3000}:80"
+      - "3001:80"
+      - "3002:80"
 
     depends_on:
       - backend
@@ -252,7 +254,7 @@ networks:
 # ACESSOS
 # ============================================
 #
-# Frontend:    http://localhost:${FRONTEND_PORT}
+# Frontend:    http://localhost:3001 ou http://localhost:3002
 # Backend:     http://localhost:${BACKEND_PORT}
 # Swagger:     http://localhost:${BACKEND_PORT}/swagger-ui.html
 # MinIO:       http://localhost:${MINIO_CONSOLE_PORT}
