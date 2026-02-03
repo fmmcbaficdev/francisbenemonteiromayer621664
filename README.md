@@ -86,7 +86,7 @@ Sistema full stack para gerenciamento de artistas musicais e seus álbuns, com a
 
 ## 🚀 Como Executar
 
-> **Para o avaliador:** use o guia **[COMO_ABRIR_PARA_AVALIADOR.md](docs/COMO_ABRIR_PARA_AVALIADOR.md)** — passos mínimos para abrir o projeto sem erros. Em caso de problemas ao executar, consulte **[PROBLEMAS_COMUNS_AVALIADOR.md](docs/PROBLEMAS_COMUNS_AVALIADOR.md)**. Revisão item a item conforme o edital (Anexo II-C): **[REVISAO_EDITAL_ANEXO_IIC.md](docs/REVISAO_EDITAL_ANEXO_IIC.md)**.
+> **Para o avaliador:** índice da documentação em **[docs/README.md](docs/README.md)**. Guia rápido: [COMO_ABRIR_PARA_AVALIADOR](docs/COMO_ABRIR_PARA_AVALIADOR.md). Problemas ao executar: [PROBLEMAS_COMUNS_AVALIADOR](docs/PROBLEMAS_COMUNS_AVALIADOR.md). Revisão edital: [REVISAO_EDITAL_ANEXO_IIC](docs/REVISAO_EDITAL_ANEXO_IIC.md).
 
 ### Pré-requisitos
 - Docker 24.0+ e Docker Compose 2.20+
@@ -603,7 +603,7 @@ O sistema já vem com os artistas do edital via Flyway Migration:
 - ✅ Requisitos obrigatórios implementados (CRUD, JWT, MinIO, WebSocket, rate limit, Flyway, Swagger, testes).
 - ✅ Projeto sobe apenas com Docker e Docker Compose; não é necessário instalar Java, Node, PostgreSQL ou MinIO localmente.
 - ✅ O `.env.example` contém valores que funcionam para avaliação; basta copiar para `.env`.
-- ✅ Guia rápido: [docs/COMO_ABRIR_PARA_AVALIADOR.md](docs/COMO_ABRIR_PARA_AVALIADOR.md). Problemas comuns: [docs/PROBLEMAS_COMUNS_AVALIADOR.md](docs/PROBLEMAS_COMUNS_AVALIADOR.md). Revisão conforme edital: [docs/REVISAO_EDITAL_ANEXO_IIC.md](docs/REVISAO_EDITAL_ANEXO_IIC.md).
+- ✅ **Documentação:** índice em [docs/README.md](docs/README.md). Guia rápido: [COMO_ABRIR_PARA_AVALIADOR](docs/COMO_ABRIR_PARA_AVALIADOR.md). Problemas: [PROBLEMAS_COMUNS_AVALIADOR](docs/PROBLEMAS_COMUNS_AVALIADOR.md). Revisão edital: [REVISAO_EDITAL_ANEXO_IIC](docs/REVISAO_EDITAL_ANEXO_IIC.md). Como testar cada requisito: [REQUISITOS_SENIOR](docs/REQUISITOS_SENIOR_AVALIACAO_E_COMO_TESTAR.md).
 
 ### Imagens Docker (Docker Hub)
 

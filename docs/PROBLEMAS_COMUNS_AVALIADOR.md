@@ -90,7 +90,7 @@ Se quiser usar 3003 em vez de 3001/3002:
 ## Resumo rápido
 
 1. Sempre criar o `.env`: `cp .env.example .env`.  
-2. Garantir portas 3000, 8080, 5432, 9000, 9001 livres.  
+2. Garantir portas 3001, 3002, 8080, 5432, 9000, 9001 livres.  
 3. Após `docker compose up -d`, aguardar 1–2 min e verificar `docker compose ps` (backend **healthy**).  
 4. Login: **admin** / **admin123**.  
 5. Se algo falhar: `docker compose logs backend` (e, se necessário, `docker compose logs frontend`).  

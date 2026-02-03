@@ -65,7 +65,7 @@ A partir daí, todas as chamadas feitas pelo Swagger incluirão o header `Author
 ## Fluxo sugerido (Frontend + Swagger)
 
 1. Subir o projeto: `docker compose up -d` (ou backend e frontend separados).
-2. **Frontend:** abrir http://localhost:3000, fazer login (admin / admin123) e usar a aplicação normalmente.
+2. **Frontend:** abrir http://localhost:3001 (ou 3002), fazer login (admin / admin123) e usar a aplicação normalmente.
 3. **Swagger:** abrir http://localhost:8080/swagger-ui.html (ou usar o link **API (Swagger)** no menu do frontend), fazer login no Swagger, clicar em **Authorize** e colar o token.
 4. No Swagger: testar listagens, criação, edição e exclusão de artistas e álbuns, sincronização de regionais e upload de imagens.
 
@@ -86,3 +86,16 @@ Assim você cobre tanto o uso pela interface (frontend) quanto as chamadas diret
 | 429    | Rate limit (máx. 10 requisições/minuto por usuário). |
 
 Se receber **401** no Swagger, refaça o login (POST /v1/auth/login), copie o novo **accessToken** e use **Authorize** novamente com esse token.
+
+---
+
+## Checklist rápido (avaliador)
+
+- [ ] Acessar http://localhost:8080/swagger-ui.html
+- [ ] **POST /v1/auth/login** com `{"username":"admin","password":"admin123"}` → copiar `accessToken`
+- [ ] Clicar em **Authorize** → colar `Bearer <token>` → Authorize → Close
+- [ ] **GET /v1/artistas** e **GET /v1/albuns** (listagem paginada)
+- [ ] **POST /v1/artistas** e **POST /v1/albuns** (criar)
+- [ ] **POST /v1/albuns/{id}/imagens** (upload de capa, multipart)
+- [ ] **POST /v1/regionais/sincronizar** (sincronização externa)
+- [ ] **POST /v1/auth/refresh** (renovação de token)
