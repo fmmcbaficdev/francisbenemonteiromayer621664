@@ -1,13 +1,34 @@
 # 🎵 Sistema de Gerenciamento de Artistas e Álbuns
-**Projeto Prático - Concurso Público SEPLAG/MT 2026 (PSS 001/2026)**
 
-## 📋 Identificação
-- **Candidato:** Francisbene Monteiro Mayer
+> Processo Seletivo Simplificado nº 001/2026/SEPLAG  
+> Analista de Tecnologia da Informação - Desenvolvimento Full Stack Sênior
+
+## 📋 Dados do Candidato
+
+- **Nome:** Francis Bene Monteiro Mayer
 - **Inscrição:** (informar no ato da inscrição no SIES)
-- **Vaga:** Analista de TI - Desenvolvimento Full Stack Sênior
-- **Cargo:** Analista de Sistemas
+- **Projeto:** Full Stack
 - **Email:** fmmcba1@gmail.com
 - **GitHub:** https://github.com/fmmcbaficdev
+- **Docker Hub:** https://hub.docker.com/u/francisbene
+
+---
+
+## ✅ Funcionalidades Implementadas
+
+- ✅ CRUD completo de Artistas
+- ✅ CRUD completo de Álbuns
+- ✅ Upload de imagens de capa (MinIO/S3) e remoção de capa
+- ✅ Autenticação JWT com expiração (5 min) e renovação automática
+- ✅ Paginação e ordenação; filtros por nome/título
+- ✅ WebSocket para notificações em tempo real
+- ✅ Sincronização com API externa de Regionais
+- ✅ Health checks (Liveness/Readiness)
+- ✅ Rate limiting (10 requisições/minuto por usuário)
+- ✅ Testes unitários (backend e frontend)
+- ✅ Documentação OpenAPI/Swagger
+- ✅ Migrations com Flyway
+- ✅ Docker e Docker Compose (dev e produção)
 
 ---
 
@@ -72,21 +93,60 @@ Sistema full stack para gerenciamento de artistas musicais e seus álbuns, com a
 - Portas livres: **3001 e 3002** (frontend), 8080, 5432, 9000, 9001
 - Mínimo 4GB RAM disponível
 
-### Execução em 3 Passos
-```bash
-# 1. Clonar o repositório
-git clone https://github.com/fmmcbaficdev/francisbenemonteiromayer621664
-cd francisbenemonteiromayer621664
+### Passo a passo
 
-# 2. Configurar variáveis de ambiente (não é necessário editar — valores do .env.example funcionam)
+#### 1. Clonar ou baixar o repositório
+
+```bash
+git clone https://github.com/fmmcbaficdev/francisbenemonteiromayer621664.git
+cd francisbenemonteiromayer621664
+```
+
+Ou baixe o ZIP em: https://github.com/fmmcbaficdev/francisbenemonteiromayer621664 → **Code** → **Download ZIP**, extraia e abra o terminal na pasta.
+
+#### 2. Configurar variáveis de ambiente
+
+**Obrigatório:** crie o arquivo `.env` a partir do exemplo. O `.env.example` já traz valores que funcionam para avaliação (não é necessário editar).
+
+```bash
+# Linux / Mac / Git Bash
 cp .env.example .env
 
-# 3. Subir todos os serviços
-docker compose up --build -d
+# Windows (PowerShell)
+Copy-Item .env.example .env
 
-# 4. Aguardar inicialização (1-2 minutos)
-docker compose logs -f backend
+# Windows (CMD)
+copy .env.example .env
 ```
+
+#### 3. Subir a aplicação
+
+**Método 1 – Build local (recomendado para avaliação)**
+
+```bash
+docker compose up --build -d
+```
+
+Aguarde 1 a 2 minutos. Acompanhe: `docker compose logs -f backend` até aparecer `Started BackendApplication`.
+
+**Método 2 – Usar imagens do Docker Hub (sem build)**
+
+Se preferir apenas baixar e rodar as imagens já publicadas:
+
+```bash
+docker compose -f docker-compose.prod.yml pull
+docker compose -f docker-compose.prod.yml up -d
+```
+
+Requer que `REGISTRY=francisbene` e `IMAGE_TAG=1.0.0` (ou a tag publicada) estejam no `.env`. Veja [docs/DEPLOY_PRODUCAO.md](docs/DEPLOY_PRODUCAO.md).
+
+#### 4. Verificar se está rodando
+
+```bash
+docker compose ps
+```
+
+Todos os serviços devem estar **Up**; o backend pode levar ~1 minuto para ficar **(healthy)**.
 
 ### Acessos
 
@@ -98,18 +158,110 @@ docker compose logs -f backend
 | **MinIO Console** | http://localhost:9001 | minioadmin / minioadmin123 (se usou .env.example) |
 | **PostgreSQL** | localhost:5432 | seplag / seplag123 (se usou .env.example) |
 
-**Nota:** As imagens de capa dos álbuns ficam no MinIO (volume Docker). Em outro clone ou outra máquina, o MinIO sobe vazio — artistas e álbuns vêm do seed, mas as capas só aparecem após upload pela tela de edição do álbum (requisito do edital: upload e presigned URL).
+### Credenciais de acesso
 
-### Verificação de Saúde
+- **Login na aplicação (JWT):** usuário `admin`, senha `admin123`
+- **MinIO Console:** minioadmin / minioadmin123 (valores do `.env.example`)
+- **PostgreSQL:** seplag / seplag123 (valores do `.env.example`)
+
+**Nota:** As imagens de capa dos álbuns ficam no MinIO (volume Docker). Em outro clone ou outra máquina, o MinIO sobe vazio — artistas e álbuns vêm do seed; as capas só aparecem após upload pela tela de edição do álbum.
+
+### Verificação de saúde
+
+```bash
+curl http://localhost:8080/actuator/health
+curl http://localhost:3001
+curl http://localhost:8080/actuator/health/liveness
+```
+
+---
+
+## 🧪 Como testar
+
+### Via Swagger (recomendado)
+
+1. Acesse http://localhost:8080/swagger-ui.html (ou use o link **API (Swagger)** no menu do frontend).
+2. Faça login em `POST /v1/auth/login` com `{"username":"admin","password":"admin123"}`.
+3. Copie o `accessToken` da resposta.
+4. Clique em **Authorize** no topo da página e cole: `Bearer <seu-token>`.
+5. Teste os endpoints de artistas, álbuns, regionais, etc.
+
+Passo a passo detalhado: [docs/TESTES_VIA_SWAGGER.md](docs/TESTES_VIA_SWAGGER.md).
+
+### Testes automatizados
+
 ```bash
 # Backend
-curl http://localhost:8080/actuator/health
+cd backend && ./mvnw test
 
 # Frontend
-curl http://localhost:3001
+cd frontend && npm test
+```
 
-# MinIO
-curl http://localhost:9000/minio/health/live
+---
+
+## 📂 Estrutura do projeto
+
+```
+.
+├── backend/
+│   ├── src/main/java/.../controller/, service/, repository/, model/, dto/, config/, security/
+│   ├── src/main/resources/application.properties, db/migration/ (Flyway)
+│   ├── src/test/
+│   ├── Dockerfile
+│   └── pom.xml
+├── frontend/
+│   ├── src/components/, pages/, context/, core/, shared/
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   └── package.json
+├── docs/                    # Guias para avaliador e deploy
+├── docker-compose.yml       # Desenvolvimento (build local)
+├── docker-compose.prod.yml  # Produção (imagens do registry)
+├── .env.example
+└── README.md
+```
+
+---
+
+## 🔄 Principais endpoints
+
+| Área | Método | Endpoint |
+|------|--------|----------|
+| **Auth** | POST | `/v1/auth/login` — Login |
+| | POST | `/v1/auth/refresh` — Renovar token |
+| **Artistas** | GET | `/v1/artistas` — Listar (paginado) |
+| | GET | `/v1/artistas/{id}` — Buscar por ID |
+| | GET | `/v1/artistas/buscar?nome=` — Buscar por nome |
+| | POST / PUT / DELETE | `/v1/artistas`, `/v1/artistas/{id}` |
+| **Álbuns** | GET | `/v1/albuns`, `/v1/albuns/{id}`, `/v1/albuns/artista/{artistaId}` |
+| | POST / PUT / DELETE | `/v1/albuns`, `/v1/albuns/{id}` |
+| | POST | `/v1/albuns/{id}/imagens` — Upload de capa |
+| | DELETE | `/v1/albuns/{albumId}/imagens/{imagemId}` — Remover capa |
+| **Regionais** | GET | `/v1/regionais` |
+| | POST | `/v1/regionais/sincronizar` — Sincronizar com API externa |
+| **Health** | GET | `/actuator/health`, `/actuator/health/liveness`, `/actuator/health/readiness` |
+
+---
+
+## 🛑 Comandos úteis
+
+```bash
+# Status dos containers
+docker compose ps
+
+# Logs em tempo real
+docker compose logs -f backend
+docker compose logs -f frontend
+
+# Parar a aplicação
+docker compose down
+
+# Parar e remover volumes (limpar dados)
+docker compose down -v
+
+# Reconstruir e subir
+docker compose up --build -d
 ```
 
 ---
@@ -404,7 +556,7 @@ for (Regional externo : externos) {
 - [x] **Custom hooks** reutilizáveis
 
 #### Testes e Containerização (0-3)
-- [x] **Testes unitários** (Jest + React Testing Library)
+- [x] **Testes unitários** (Vitest + React Testing Library)
 - [x] **Dockerfile** otimizado (multi-stage)
 - [x] **Docker Compose** funcional
 
@@ -446,25 +598,77 @@ O sistema já vem com os artistas do edital via Flyway Migration:
 
 ---
 
+## 📌 Para o avaliador
+
+- ✅ Requisitos obrigatórios implementados (CRUD, JWT, MinIO, WebSocket, rate limit, Flyway, Swagger, testes).
+- ✅ Projeto sobe apenas com Docker e Docker Compose; não é necessário instalar Java, Node, PostgreSQL ou MinIO localmente.
+- ✅ O `.env.example` contém valores que funcionam para avaliação; basta copiar para `.env`.
+- ✅ Guia rápido: [docs/COMO_ABRIR_PARA_AVALIADOR.md](docs/COMO_ABRIR_PARA_AVALIADOR.md). Problemas comuns: [docs/PROBLEMAS_COMUNS_AVALIADOR.md](docs/PROBLEMAS_COMUNS_AVALIADOR.md). Revisão conforme edital: [docs/REVISAO_EDITAL_ANEXO_IIC.md](docs/REVISAO_EDITAL_ANEXO_IIC.md).
+
+### Imagens Docker (Docker Hub)
+
+As imagens também estão disponíveis no Docker Hub para quem preferir não fazer build local:
+
+- **Backend:** `francisbene/seplag-backend:latest` (ou tag específica, ex.: `1.0.0`)
+- **Frontend:** `francisbene/seplag-frontend:latest`
+
+Repositório: https://hub.docker.com/u/francisbene
+
+Para usar apenas as imagens (sem build): configure `REGISTRY=francisbene` e `IMAGE_TAG=...` no `.env` e rode `docker compose -f docker-compose.prod.yml pull` e `docker compose -f docker-compose.prod.yml up -d`. Veja [docs/DEPLOY_PRODUCAO.md](docs/DEPLOY_PRODUCAO.md).
+
+---
+
 ## 🐛 Troubleshooting
 
-### Backend não inicia
+### Porta já em uso
+
+O frontend usa **3001 e 3002**. Se alguma estiver ocupada, use a outra. Se ambas estiverem ocupadas, veja [docs/PROBLEMAS_COMUNS_AVALIADOR.md](docs/PROBLEMAS_COMUNS_AVALIADOR.md).
+
 ```bash
-docker-compose logs backend
-docker-compose logs postgres | grep "ready to accept connections"
+# Windows: ver o que usa a porta 3001
+netstat -ano | findstr :3001
+
+# Linux/Mac
+lsof -i :3001
 ```
+
+### Backend não inicia ou não fica (healthy)
+
+```bash
+docker compose logs backend
+docker compose logs postgres
+```
+
+Confira no `.env`: `POSTGRES_HOST=postgres`, `POSTGRES_PASSWORD` e demais variáveis de banco; `JWT_SECRET` deve ter pelo menos 256 bits (o valor do `.env.example` atende).
+
+### Erro "arquivo .env não encontrado"
+
+Crie o `.env` a partir do exemplo: `cp .env.example .env` (Linux/Mac/Git Bash) ou `Copy-Item .env.example .env` (PowerShell) ou `copy .env.example .env` (CMD).
 
 ### Frontend com CORS error
+
+O backend deve permitir a origem do frontend. No `.env`, `CORS_ALLOWED_ORIGINS` deve incluir `http://localhost:3001` e `http://localhost:3002` (o `.env.example` já inclui).
+
 ```bash
-docker-compose exec backend env | grep CORS_ALLOWED_ORIGINS
-# Deve retornar: CORS_ALLOWED_ORIGINS=http://localhost:3000
+docker compose exec backend env | grep CORS_ALLOWED_ORIGINS
 ```
 
-### MinIO não aceita upload
+### MinIO / upload de capas
+
 ```bash
-docker-compose logs minio-init
-docker-compose exec minio mc mb /data/album-covers
+docker compose logs minio-init
 ```
+
+O bucket é criado automaticamente. Se o MinIO subir vazio (novo clone), as capas só aparecem após upload pela tela de edição do álbum.
+
+### Imagens não baixam do Docker Hub (compose prod)
+
+```bash
+docker pull francisbene/seplag-backend:latest
+docker pull francisbene/seplag-frontend:latest
+```
+
+Se funcionar, em seguida: `docker compose -f docker-compose.prod.yml up -d`.
 
 ---
 
@@ -478,12 +682,19 @@ docker-compose exec minio mc mb /data/album-covers
 
 ---
 
-## 📞 Contato
+## 📚 Referências
 
-**Candidato:** Francisbene Monteiro Mayer  
-**Email:** fmmcba1@gmail.com  
-**GitHub:** https://github.com/fmmcbaficdev
+- [Spring Boot](https://spring.io/projects/spring-boot) · [MinIO](https://min.io/docs) · [JWT.io](https://jwt.io) · [Flyway](https://flywaydb.org/documentation/) · [Docker](https://docs.docker.com/) · [Docker Hub - francisbene](https://hub.docker.com/u/francisbene)
 
 ---
 
-**Desenvolvido para o Concurso Público SEPLAG/MT - 2025**
+## 📞 Contato
+
+**Candidato:** Francis Bene Monteiro Mayer  
+**Email:** fmmcba1@gmail.com  
+**GitHub:** https://github.com/fmmcbaficdev  
+**Docker Hub:** https://hub.docker.com/u/francisbene
+
+---
+
+**Desenvolvido para o Processo Seletivo Simplificado nº 001/2026/SEPLAG — Janeiro de 2026**

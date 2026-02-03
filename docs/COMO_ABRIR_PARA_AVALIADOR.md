@@ -14,11 +14,25 @@ Este guia garante que o avaliador consiga subir e testar o projeto em poucos pas
 
 ## Passos (avaliador)
 
-### 1. Clonar e entrar na pasta
+### 1. Descarregar o projeto
+
+**Opção A – Git (recomendado)**
+
+Se tiver Git instalado:
 
 ```bash
-git clone <URL_DO_REPOSITORIO>
+git clone https://github.com/fmmcbaficdev/francisbenemonteiromayer621664.git
 cd francisbenemonteiromayer621664
+```
+
+**Opção B – Download em ZIP (GitHub)**
+
+1. Abra: https://github.com/fmmcbaficdev/francisbenemonteiromayer621664  
+2. Clique em **Code** → **Download ZIP**  
+3. Extraia o ZIP numa pasta e abra o terminal nessa pasta (o nome da pasta será algo como `francisbenemonteiromayer621664-main`)
+
+```bash
+cd francisbenemonteiromayer621664-main
 ```
 
 ### 2. Criar o arquivo `.env`
