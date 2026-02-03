@@ -6,7 +6,7 @@
 ## 📋 Dados do Candidato
 
 - **Nome:** Francis Bene Monteiro Mayer
-- **Inscrição:** (informar no ato da inscrição no SIES)
+- **Inscrição:** 16342
 - **Projeto:** Full Stack
 - **Email:** fmmcba1@gmail.com
 - **GitHub:** https://github.com/fmmcbaficdev
