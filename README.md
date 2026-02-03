@@ -153,7 +153,7 @@ Todos os serviços devem estar **Up**; o backend pode levar ~1 minuto para ficar
 | Serviço | URL | Credenciais |
 |---------|-----|-------------|
 | **Frontend** | http://localhost:3001 ou http://localhost:3002 | admin / admin123 |
-| **Backend API** | http://localhost:8080 | - |
+| **Backend API** | http://localhost:8080 | GET na raiz retorna JSON com links para Swagger e health. |
 | **Swagger UI** | http://localhost:8080/swagger-ui.html | - |
 | **MinIO Console** | http://localhost:9001 | minioadmin / minioadmin123 (se usou .env.example) |
 | **PostgreSQL** | localhost:5432 | seplag / seplag123 (se usou .env.example) |
