@@ -1,0 +1,183 @@
+# ============================================
+# Docker Compose para PRODUÇÃO
+# ============================================
+#
+# Uso: imagens já buildadas e enviadas a um registry.
+# No servidor NÃO se faz build; só pull e up.
+#
+# 1) Build e push (em CI ou na sua máquina):
+#    docker build -t SEU_REGISTRY/seplag-backend:1.0.0 ./backend
+#    docker build -t SEU_REGISTRY/seplag-frontend:1.0.0 ./frontend
+#    docker push SEU_REGISTRY/seplag-backend:1.0.0
+#    docker push SEU_REGISTRY/seplag-frontend:1.0.0
+#
+# 2) No servidor, crie .env com variáveis de produção e:
+#    REGISTRY=francisbene  (Docker Hub: https://hub.docker.com/repositories/francisbene)
+#    IMAGE_TAG=1.0.0
+#    docker compose -f docker-compose.prod.yml pull
+#    docker compose -f docker-compose.prod.yml up -d
+#
+# Variáveis opcionais para imagens:
+#   REGISTRY   - Docker Hub: francisbene (padrão)
+#   IMAGE_TAG  - ex: 1.0.0 ou latest
+# ============================================
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: ${COMPOSE_PROJECT_NAME:-seplag}-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - seplag-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  minio:
+    image: minio/minio:latest
+    container_name: ${COMPOSE_PROJECT_NAME:-seplag}-minio
+    restart: always
+    command: server /data --console-address ":${MINIO_CONSOLE_PORT:-9001}"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - seplag-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: ${COMPOSE_PROJECT_NAME:-seplag}-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+    entrypoint: >
+      /bin/sh -c "
+      sleep 3;
+      mc alias set myminio http://minio:9000 $${MINIO_ROOT_USER} $${MINIO_ROOT_PASSWORD};
+      mc mb --ignore-existing myminio/$${MINIO_BUCKET_NAME};
+      mc anonymous set download myminio/$${MINIO_BUCKET_NAME};
+      echo 'MinIO bucket configurado';
+      exit 0;
+      "
+    networks:
+      - seplag-network
+
+  backend:
+    # Imagem do registry (build feito em CI ou localmente, depois push).
+    image: ${REGISTRY:-francisbene}/seplag-backend:${IMAGE_TAG:-latest}
+    container_name: ${COMPOSE_PROJECT_NAME:-seplag}-backend
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${POSTGRES_HOST:-postgres}:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      MINIO_URL: ${MINIO_URL}
+      MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL:-http://localhost:9000}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+      MINIO_PRESIGNED_URL_EXPIRY_MINUTES: ${MINIO_PRESIGNED_URL_EXPIRY_MINUTES:-30}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-300000}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-86400000}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+      RATE_LIMIT_REQUESTS_PER_MINUTE: ${RATE_LIMIT_REQUESTS_PER_MINUTE:-10}
+      EXTERNAL_REGIONAIS_API_URL: ${EXTERNAL_REGIONAIS_API_URL}
+      LOGGING_LEVEL_ROOT: ${LOG_LEVEL_ROOT:-INFO}
+      LOGGING_LEVEL_BR_GOV_MT_SEPLAG: ${LOG_LEVEL_APP:-INFO}
+      JAVA_OPTS: ${JAVA_OPTS:--Xms512m -Xmx1024m}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - seplag-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health/liveness"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  frontend:
+    # Imagem do registry (build com VITE_API_URL/VITE_WS_URL da produção).
+    image: ${REGISTRY:-francisbene}/seplag-frontend:${IMAGE_TAG:-latest}
+    container_name: ${COMPOSE_PROJECT_NAME:-seplag}-frontend
+    restart: always
+    ports:
+      - "3001:80"
+      - "3002:80"
+    depends_on:
+      - backend
+    networks:
+      - seplag-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  postgres_data:
+    driver: local
+    name: ${COMPOSE_PROJECT_NAME:-seplag}_postgres_data
+  minio_data:
+    driver: local
+    name: ${COMPOSE_PROJECT_NAME:-seplag}_minio_data
+
+networks:
+  seplag-network:
+    driver: bridge
+    name: ${COMPOSE_PROJECT_NAME:-seplag}_network

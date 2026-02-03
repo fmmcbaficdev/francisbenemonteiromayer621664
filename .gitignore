@@ -8,7 +8,7 @@
 # NUNCA commitar arquivos com senhas/secrets
 .env
 .env.local
-.env.production
+.env.prod
 .env.*.local
 *.pem
 *.key
